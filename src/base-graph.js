@@ -1,6 +1,6 @@
 function checkProbability(probability) {
     if (probability < 0 || probability > 1) {
-        throw new Error("Вероятность должна быть от 0 до 1");
+        throw new Error("Probability must be between 0 and 1");
     }
     return Math.random() < probability ? 1 : 0;
 }
@@ -153,6 +153,7 @@ class Graph {
     get Matrix() { return this.Matrix; }
     get GenType() { return this.genType; }
     get EdgeNumber() { return this.edgeNumber; }
+    get SumWeights() { return this.sumWeights; }
     printGraph() { console.log(this.matrix); }
 }
 
