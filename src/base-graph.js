@@ -18,6 +18,7 @@ class Graph {
     size = 0;
     edgeNumber = 0;
     sumWeights = 0;
+    connectedComponents = 0;
     matrix = []
     constructor(size = 0, edgeNumber = 0,
                 genType = GraphGenerationType.DEFAULT) {
@@ -42,14 +43,43 @@ class Graph {
         default:
             throw new Error(`Unknown graph generation type: ${genType}`);
         }
+        this.connectedComponents = this.findConnectedComponents();
     }
+
     clone(old_graph) {
         this.genType = old_graph.genType;
         this.size = old_graph.size;
         this.edgeNumber = old_graph.edgeNumber;
         this.sumWeights = old_graph.sumWeights;
+        this.connectedComponents = old_graph.connectedComponents;
         this.matrix = old_graph.matrix.map(row => [...row]);
     }
+
+    findConnectedComponents() {
+        if (this.size === 0) {
+            return 0;
+        }
+
+        const nodes = new Set();
+        for (let i = 0; i < this.size; i++) {
+            nodes.add(i);
+        }
+
+        let components = 0;
+        while (nodes.size > 0) {
+            const firstNode = nodes.values().next().value;
+            const visitedNodes = BFS(this, firstNode);
+
+            for (const node of visitedNodes) {
+                nodes.delete(node);
+            }
+
+            components++;
+        }
+
+        return components;
+    }
+
     generateDefault() {
         let edgesAdded = 0;
 
@@ -103,7 +133,15 @@ class Graph {
             edgesAdded++;
         }
     }
-
+    neighbors(ind) {
+        let result = [];
+        for (let i = 0; i < this.matrix[ind].length; i++) {
+            if (this.matrix[ind][i]) {
+                result.push(i);
+            }
+        }
+        return result;
+    }
     countEdges() {
         let edgeNumber = 0;
         for (let row of this.matrix) {
@@ -124,6 +162,7 @@ class Graph {
                 }
             }
         }
+        return sumWeights;
     }
 
     classicMultiply(power) {
@@ -138,7 +177,9 @@ class Graph {
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
+        this.connectedComponents = this.findConnectedComponents();
     }
+
     logicalMultiply(power) {
         if (power < 1) {
             throw new Error("Bad power");
@@ -151,6 +192,7 @@ class Graph {
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
+        this.connectedComponents = this.findConnectedComponents();
     }
 
     tropicalMultiply(power) {
@@ -165,6 +207,7 @@ class Graph {
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
+        this.connectedComponents = this.findConnectedComponents();
     }
 
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
@@ -243,15 +286,12 @@ function tropicalMatrixMultiply(first, second) {
     for (let i = 0; i < rows1; i++) {
         for (let j = 0; j < cols2; j++) {
             for (let k = 0; k < cols1; k++) {
-                // Особый случай: если элемент равен 0, считаем его как
-                // бесконечность
                 const firstVal = first[i][k] === 0 ? Infinity : first[i][k];
                 const secondVal = second[k][j] === 0 ? Infinity : second[k][j];
 
                 newMatrix[i][j] =
                     Math.min(newMatrix[i][j], firstVal + secondVal);
             }
-            // Если результат остался Infinity, заменяем на 0
             newMatrix[i][j] =
                 newMatrix[i][j] === Infinity ? 0 : newMatrix[i][j];
         }
@@ -259,11 +299,34 @@ function tropicalMatrixMultiply(first, second) {
     return newMatrix;
 };
 
+function BFS(graph, startIndex) {
+    const visited = new Set();
+    const toVisit = [ startIndex ];
+
+    while (toVisit.length > 0) {
+        const nodeIndex = toVisit.shift();
+
+        if (!visited.has(nodeIndex)) {
+            visited.add(nodeIndex);
+
+            const neighbors = graph.neighbors(nodeIndex);
+            for (const neighbor of neighbors) {
+                if (!visited.has(neighbor)) {
+                    toVisit.push(neighbor);
+                }
+            }
+        }
+    }
+
+    return visited;
+}
+
 export {
     checkProbability,
     GraphGenerationType,
     Graph,
     classicMatrixMultiply,
     logicalMatrixMultiply,
-    tropicalMatrixMultiply
+    tropicalMatrixMultiply,
+    BFS
 };
