@@ -16,13 +16,13 @@ const GraphGenerationType = Object.freeze({
 class Graph {
     genType = 'DEFAULT';
     size = 0;
-    probability = 0.5;
     edgeNumber = 0;
     sumWeights = 0;
     matrix = []
-    constructor(size, probability, genType) {
+    constructor(size = 0, edgeNumber = 0,
+                genType = GraphGenerationType.DEFAULT) {
         this.size = size;
-        this.probability = probability;
+        this.edgeNumber = edgeNumber;
         this.genType = genType;
         this.matrix = Array.from({length : this.size},
                                  () => new Array(this.size).fill(0));
@@ -34,7 +34,7 @@ class Graph {
             this.generateSymmetrical();
             break;
         case GraphGenerationType.ASYMMETRICAL:
-            this.generateAssymetrical();
+            this.generateAsymmetrical();
             break;
         case GraphGenerationType.ANTISYMMETRICAL:
             this.generateAntisymmetrical();
@@ -43,61 +43,64 @@ class Graph {
             throw new Error(`Unknown graph generation type: ${genType}`);
         }
     }
-
+    clone(old_graph) {
+        this.genType = old_graph.genType;
+        this.size = old_graph.size;
+        this.edgeNumber = old_graph.edgeNumber;
+        this.sumWeights = old_graph.sumWeights;
+        this.matrix = old_graph.matrix.map(row => [...row]);
+    }
     generateDefault() {
-        for (let i = 0; i != this.size; i++) {
-            for (let j = 0; j != this.size; j++) {
-                let result = checkProbability(this.probability);
-                if (result) {
-                    this.edgeNumber++;
-                }
-                this.matrix[i][j] = result;
-            }
+        let edgesAdded = 0;
+
+        while (edgesAdded < this.edgeNumber) {
+            const i = Math.floor(Math.random() * this.size);
+            const j = Math.floor(Math.random() * this.size);
+            if (this.matrix[i][j] === 1)
+                continue;
+
+            this.matrix[i][j] = 1;
+            edgesAdded++;
         }
     }
 
     generateSymmetrical() {
-        for (let i = 0; i != this.size; i++) {
-            for (let j = i; j < this.size; j++) {
-                let result = checkProbability(this.probability);
-                if (result) {
-                    this.edgeNumber += 2;
-                }
-                this.matrix[i][j] = result;
-                this.matrix[j][i] = result;
-            }
+        while (edgesAdded < this.edgeNumber) {
+            const i = Math.floor(Math.random() * this.size);
+            const j = Math.floor(Math.random() * this.size);
+            if (this.matrix[i][j] === 1)
+                continue;
+
+            this.matrix[i][j] = 1;
+            this.matrix[j][i] = 1;
+            edgesAdded++;
+            if (i === j)
+                continue;
+            edgesAdded++;
         }
     }
 
     generateAntisymmetrical() {
-        for (let i = 0; i != this.size; i++) {
-            for (let j = i; j < this.size; j++) {
-                let result = checkProbability(this.probability);
-                if (result) {
-                    this.edgeNumber++;
-                }
-                if (checkProbability(0.5)) {
-                    this.matrix[j][i] = result;
-                } else {
-                    this.matrix[i][j] = result;
-                }
-            }
+        while (edgesAdded < this.edgeNumber) {
+            const i = Math.floor(Math.random() * this.size);
+            const j = Math.floor(Math.random() * this.size);
+            if (this.matrix[i][j] === 1 || this.matrix[j][i] === 1)
+                continue;
+
+            this.matrix[i][j] = 1;
+            edgesAdded++;
         }
     }
 
     generateAsymmetrical() {
-        for (let i = 0; i != this.size; i++) {
-            for (let j = i + 1; j < this.size; j++) {
-                let result = checkProbability(this.probability);
-                if (result) {
-                    this.edgeNumber++;
-                }
-                if (checkProbability(0.5)) {
-                    this.matrix[j][i] = result;
-                } else {
-                    this.matrix[i][j] = result;
-                }
-            }
+        while (edgesAdded < this.edgeNumber) {
+            const i = Math.floor(Math.random() * this.size);
+            const j = Math.floor(Math.random() * this.size);
+            if (i === j || this.matrix[i][j] === 1 || this.matrix[j][i] === 1)
+                continue;
+
+            this.matrix[i][j] = 1;
+            edgesAdded++;
         }
     }
 
@@ -122,6 +125,7 @@ class Graph {
             }
         }
     }
+
     classicMultiply(power) {
         if (power < 1) {
             throw new Error("Bad power");
@@ -149,6 +153,20 @@ class Graph {
         this.sumWeights = this.countWeights();
     }
 
+    tropicalMultiply(power) {
+        if (power < 1) {
+            throw new Error("Bad power");
+        }
+        let new_matrix = this.matrix.map(row => [...row]);
+        for (let i = 1; i < power; i++) {
+            new_matrix = tropicalMatrixMultiply(new_matrix, this.matrix);
+        }
+        this.matrix = new_matrix;
+        this.genType = GraphGenerationType.UNKNOWN;
+        this.edgeNumber = this.countEdges();
+        this.sumWeights = this.countWeights();
+    }
+
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
     get Matrix() { return this.Matrix; }
     get GenType() { return this.genType; }
@@ -158,16 +176,20 @@ class Graph {
 }
 
 function classicMatrixMultiply(first, second) {
-    if (first[0].length !== second.length) {
+    let rows1 = first.length;
+    let cols1 = first[0].length;
+    let rows2 = second.length;
+    let cols2 = second[0].length;
+    if (cols1 !== rows2) {
         throw new Error(
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
     new_matrix = [];
-    for (let i = 0; i != first.length; i++) {
+    for (let i = 0; i != rows1; i++) {
         new_row = [];
-        for (let j = 0; j != first.length; j++) {
+        for (let j = 0; j != cols2; j++) {
             temp = 0;
-            for (let k = 0; k != first.length; k++) {
+            for (let k = 0; k != cols1; k++) {
                 temp += first[i][k] * second[k][j];
             }
             new_row.push(temp);
@@ -178,20 +200,22 @@ function classicMatrixMultiply(first, second) {
 };
 
 function logicalMatrixMultiply(first, second) {
-    if (first[0].length !== second.length) {
+    let rows1 = first.length;
+    let cols1 = first[0].length;
+    let rows2 = second.length;
+    let cols2 = second[0].length;
+    if (cols1 !== rows2) {
         throw new Error(
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
 
     const new_matrix = [];
-    const size = first.length;
-    const innerSize = second[0].length;
 
-    for (let i = 0; i < size; i++) {
+    for (let i = 0; i < rows1; i++) {
         const new_row = [];
-        for (let j = 0; j < innerSize; j++) {
+        for (let j = 0; j < cols2; j++) {
             let temp = false;
-            for (let k = 0; k < second.length; k++) {
+            for (let k = 0; k < cols1; k++) {
                 if (first[i][k] && second[k][j]) {
                     temp = true;
                     break;
@@ -204,9 +228,38 @@ function logicalMatrixMultiply(first, second) {
     return new_matrix;
 }
 
-function tropicalMatrixMultiply(first, second) {};
+function tropicalMatrixMultiply(first, second) {
+    let rows1 = first.length;
+    let cols1 = first[0].length;
+    let rows2 = second.length;
+    let cols2 = second[0].length;
+    if (cols1 != rows2) {
+        throw new Error(
+            "Number of columns in first matrix must equal number of rows in second matrix");
+    }
+    const newMatrix =
+        new Array(rows1).fill().map(() => new Array(cols2).fill(Infinity));
 
-module.exports = {
+    for (let i = 0; i < rows1; i++) {
+        for (let j = 0; j < cols2; j++) {
+            for (let k = 0; k < cols1; k++) {
+                // Особый случай: если элемент равен 0, считаем его как
+                // бесконечность
+                const firstVal = first[i][k] === 0 ? Infinity : first[i][k];
+                const secondVal = second[k][j] === 0 ? Infinity : second[k][j];
+
+                newMatrix[i][j] =
+                    Math.min(newMatrix[i][j], firstVal + secondVal);
+            }
+            // Если результат остался Infinity, заменяем на 0
+            newMatrix[i][j] =
+                newMatrix[i][j] === Infinity ? 0 : newMatrix[i][j];
+        }
+    }
+    return newMatrix;
+};
+
+export {
     checkProbability,
     GraphGenerationType,
     Graph,
