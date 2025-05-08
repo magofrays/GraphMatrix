@@ -46,13 +46,13 @@ class Graph {
         this.connectedComponents = this.findConnectedComponents();
     }
 
-    clone(old_graph) {
-        this.genType = old_graph.genType;
-        this.size = old_graph.size;
-        this.edgeNumber = old_graph.edgeNumber;
-        this.sumWeights = old_graph.sumWeights;
-        this.connectedComponents = old_graph.connectedComponents;
-        this.matrix = old_graph.matrix.map(row => [...row]);
+    clone(oldGraph) {
+        this.genType = oldGraph.genType;
+        this.size = oldGraph.size;
+        this.edgeNumber = oldGraph.edgeNumber;
+        this.sumWeights = oldGraph.sumWeights;
+        this.connectedComponents = oldGraph.connectedComponents;
+        this.matrix = oldGraph.matrix.map(row => [...row]);
     }
 
     findConnectedComponents() {
@@ -133,10 +133,10 @@ class Graph {
             edgesAdded++;
         }
     }
-    neighbors(ind) {
+    neighbors(idx) {
         let result = [];
-        for (let i = 0; i < this.matrix[ind].length; i++) {
-            if (this.matrix[ind][i]) {
+        for (let i = 0; i < this.matrix[idx].length; i++) {
+            if (this.matrix[idx][i]) {
                 result.push(i);
             }
         }
@@ -169,11 +169,11 @@ class Graph {
         if (power < 1) {
             throw new Error("Bad power");
         }
-        let new_matrix = this.matrix.map(row => [...row]);
+        let newMatrix = this.matrix.map(row => [...row]);
         for (let i = 1; i < power; i++) {
-            new_matrix = classicMatrixMultiply(new_matrix, this.matrix);
+            newMatrix = classicMatrixMultiply(newMatrix, this.matrix);
         }
-        this.matrix = new_matrix;
+        this.matrix = newMatrix;
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
@@ -184,11 +184,11 @@ class Graph {
         if (power < 1) {
             throw new Error("Bad power");
         }
-        let new_matrix = this.matrix.map(row => [...row]);
+        let newMatrix = this.matrix.map(row => [...row]);
         for (let i = 1; i < power; i++) {
-            new_matrix = logicalMatrixMultiply(new_matrix, this.matrix);
+            newMatrix = logicalMatrixMultiply(newMatrix, this.matrix);
         }
-        this.matrix = new_matrix;
+        this.matrix = newMatrix;
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
@@ -199,11 +199,11 @@ class Graph {
         if (power < 1) {
             throw new Error("Bad power");
         }
-        let new_matrix = this.matrix.map(row => [...row]);
+        let newMatrix = this.matrix.map(row => [...row]);
         for (let i = 1; i < power; i++) {
-            new_matrix = tropicalMatrixMultiply(new_matrix, this.matrix);
+            newMatrix = tropicalMatrixMultiply(newMatrix, this.matrix);
         }
-        this.matrix = new_matrix;
+        this.matrix = newMatrix;
         this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
@@ -211,7 +211,7 @@ class Graph {
     }
 
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
-    get Matrix() { return this.Matrix; }
+    get Matrix() { return this.matrix; }
     get GenType() { return this.genType; }
     get EdgeNumber() { return this.edgeNumber; }
     get SumWeights() { return this.sumWeights; }
@@ -227,19 +227,19 @@ function classicMatrixMultiply(first, second) {
         throw new Error(
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
-    new_matrix = [];
+    let newMatrix = [];
     for (let i = 0; i != rows1; i++) {
-        new_row = [];
+        let newRow = [];
         for (let j = 0; j != cols2; j++) {
             temp = 0;
             for (let k = 0; k != cols1; k++) {
                 temp += first[i][k] * second[k][j];
             }
-            new_row.push(temp);
+            newRow.push(temp);
         }
-        new_matrix.push(new_row);
+        newMatrix.push(newRow);
     }
-    return new_matrix;
+    return newMatrix;
 };
 
 function logicalMatrixMultiply(first, second) {
@@ -252,10 +252,9 @@ function logicalMatrixMultiply(first, second) {
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
 
-    const new_matrix = [];
-
+    let newMatrix = [];
     for (let i = 0; i < rows1; i++) {
-        const new_row = [];
+        let newRow = [];
         for (let j = 0; j < cols2; j++) {
             let temp = false;
             for (let k = 0; k < cols1; k++) {
@@ -264,11 +263,11 @@ function logicalMatrixMultiply(first, second) {
                     break;
                 }
             }
-            new_row.push(temp ? 1 : 0);
+            newRow.push(temp ? 1 : 0);
         }
-        new_matrix.push(new_row);
+        newMatrix.push(newRow);
     }
-    return new_matrix;
+    return newMatrix;
 }
 
 function tropicalMatrixMultiply(first, second) {
@@ -280,7 +279,7 @@ function tropicalMatrixMultiply(first, second) {
         throw new Error(
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
-    const newMatrix =
+    let newMatrix =
         new Array(rows1).fill().map(() => new Array(cols2).fill(Infinity));
 
     for (let i = 0; i < rows1; i++) {
