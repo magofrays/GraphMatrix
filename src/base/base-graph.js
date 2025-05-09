@@ -106,9 +106,6 @@ class Graph {
             this.matrix[i][j] = 1;
             this.matrix[j][i] = 1;
             edgesAdded++;
-            // if (i === j)
-            //     continue;
-            // edgesAdded++;
         }
     }
 
