@@ -95,6 +95,8 @@ class Graph {
     }
 
     generateSymmetrical() {
+        let edgesAdded = 0;
+
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
@@ -104,13 +106,15 @@ class Graph {
             this.matrix[i][j] = 1;
             this.matrix[j][i] = 1;
             edgesAdded++;
-            if (i === j)
-                continue;
-            edgesAdded++;
+            // if (i === j)
+            //     continue;
+            // edgesAdded++;
         }
     }
 
     generateAntisymmetrical() {
+        let edgesAdded = 0;
+
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
@@ -123,6 +127,8 @@ class Graph {
     }
 
     generateAsymmetrical() {
+        let edgesAdded = 0;
+
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
@@ -231,7 +237,7 @@ function classicMatrixMultiply(first, second) {
     for (let i = 0; i != rows1; i++) {
         let newRow = [];
         for (let j = 0; j != cols2; j++) {
-            temp = 0;
+            let temp = 0;
             for (let k = 0; k != cols1; k++) {
                 temp += first[i][k] * second[k][j];
             }
