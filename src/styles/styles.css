@@ -143,10 +143,3 @@ body {
   outline-offset: -2px;
 }
 
-.vis-network {
-    overflow: visible !important;
-}
-.vis-node {
-    transform: none !important;
-    transition: none !important;
-}
