@@ -1,0 +1,50 @@
+.level-row {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.level-row:last-child {
+    border-bottom: none;
+}
+
+#levels-container {
+    margin-top: 20px;
+}
+
+.check-answer {
+    margin-top: 10px;
+}
+
+
+
+.result-row {
+  padding: 20px;
+  display: flex;
+  flex-direction: row; 
+  gap: 20px;          
+  align-items: flex-start; 
+  margin-top: 50px;
+  margin-left: 20px;
+}
+
+.result-matrix-container {
+  flex: 0 0 300px;
+}
+
+.result-graph-container {
+  flex: 0 0 400px;
+  width: 400px;
+  height: 400px;
+} 
+
+.result-text-container {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  display: flex;
+  list-style: none;
+  padding: 0;
+  white-space: pre-line;
+  width: 300px;
+} 

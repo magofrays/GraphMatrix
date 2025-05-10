@@ -1,8 +1,10 @@
 import { demonstrationTemplate, trainingTemplate, checkTemplate } from "./templates.js";
 import { AppState } from '../base/app.js';
 import { Graph } from "../base/base-graph.js";
-import { renderMatrixTraining, renderMatrixCheck, renderMatrixDemonstration, displayGraph } from "../output/print-graph.js";
+import { renderMatrixTraining, renderMatrixCheck, renderMatrixDemonstration, displayGraph, checkMatrixCompletion, lockMatrixInputs, renderMatrix } from "../output/print-graph.js";
 import { showErrorCreateGraphMessage } from "../output/messages.js";
+import { resultRowTemplate, resultRowWithCheckTemplate, resultRowWithControlsTemplate } from "./result-templates.js";
+import { showCompletionMessage, showFailMessage } from "../output/messages.js";
 
 export const Router = {
     currentMode: null,
@@ -10,6 +12,9 @@ export const Router = {
     answerGraph: null,
     animationId: null, 
     currentInfo: "",
+    currentLevel: 1,
+    maxLevel: 5,
+    storedLevels: [],
     
     routes: {
         '#demonstration': {
@@ -38,46 +43,103 @@ export const Router = {
         }
     },
 
-    cleanupPreviousMode(isNewGraph = false) {
+    getModeTemplate() {
+        switch(this.currentMode) {
+            case 'demonstration':
+                return demonstrationTemplate;
+            case 'training':
+                return trainingTemplate;
+            case 'check':
+                return checkTemplate;
+            default:
+                return demonstrationTemplate; 
+        }
+    },
+
+    cleanElements(){
+        document.querySelectorAll('.check-answer').forEach(btn => btn.remove());
+        document.querySelectorAll('.speed-control').forEach(ctrl => ctrl.remove());
+        document.querySelectorAll('.range-label').forEach(label => label.remove());
+    },
+
+    cleanupPreviousMode(isApply = false) {
+        if (isApply){
+            this.storedLevels = [];
+        }
         if (window.currentAnimation) {
             clearTimeout(window.currentAnimation);
         }
-        
-        if (document.getElementById("check-answer")) {
-            document.getElementById("check-answer").classList.add("hidden");
-        }
-        if (document.getElementById("speed-control")) {
-            document.getElementById("speed-control").classList.add("hidden");
-            const speedLabel = document.querySelector('.range-label');
-            if (speedLabel) speedLabel.classList.add("hidden");
-        }
 
-        if (isNewGraph) this.clearGraphs();
+        const levelsContainer = document.getElementById('levels-container');
+        if (levelsContainer) {
+            levelsContainer.innerHTML = '';
+        }
+        
+        this.cleanElements();
     },
 
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
-            this.showCurrentMode();
+            if (this.currentLevel <= this.maxLevel) {
+                this.showCurrentMode();
+            }
+            this.outputStorage();
         }
     },
 
-    showCurrentMode() {
-        document.getElementById("new-text-container").textContent = this.currentInfo;
-
-        switch (this.currentMode) {
-            case 'demonstration':
-                document.getElementById("speed-control").classList.remove("hidden");
-                document.querySelector('.range-label').classList.remove("hidden");
-                this.demonstrationLogic();
-                break;
-            case 'training':
-                this.trainingLogic();
-                break;
-            case 'check':
-                document.getElementById("check-answer").classList.remove("hidden");
-                this.checkLogic();
-                break;
+    showCurrentMode(isStorage = false) {
+        const appContainer = document.getElementById('app');
+        if (this.currentLevel == this.power) {
+            appContainer.innerHTML = "";
+            appContainer.innerHTML = this.getModeTemplate();
+            this.bindApplyButton();
         }
+
+        let levelsContainer = document.getElementById('levels-container');
+        if (!levelsContainer) {
+            levelsContainer = document.createElement('div');
+            levelsContainer.id = 'levels-container';
+            appContainer.appendChild(levelsContainer);
+        }
+
+        if (!document.querySelector(`.level-row[data-level="${this.currentLevel}"]`)) {
+            this.addLevelRow(levelsContainer);
+        }
+
+        if (!isStorage){
+            switch (this.currentMode) {
+                case 'demonstration':
+                    this.initDemonstrationLevel();
+                    break;
+                case 'training':
+                    this.initTrainingLevel();
+                    break;
+                case 'check':
+                    this.initCheckLevel();
+                    break;
+            }
+        }
+    },
+
+    addLevelRow(container) {
+        let rowTemplate;
+        if (this.currentMode === 'demonstration') {
+            rowTemplate = resultRowWithControlsTemplate;
+        } else if (this.currentMode === 'check') {
+            rowTemplate = resultRowWithCheckTemplate;
+        } else {
+            rowTemplate = resultRowTemplate;
+        }
+        
+        const row = document.createElement('div');
+        row.className = 'level-row';
+        row.dataset.level = this.currentLevel;
+        row.innerHTML = rowTemplate;
+        
+        const textContainer = row.querySelector('.result-text-container');
+        textContainer.textContent = this.currentInfo;
+        
+        container.appendChild(row);
     },
 
     init() {
@@ -94,21 +156,25 @@ export const Router = {
         const route = this.routes[hash];
     
         if (route) {
-            if (window.currentAnimation) {
-                clearTimeout(window.currentAnimation);
-            }
+            this.cleanupPreviousMode();
 
             document.getElementById('app').innerHTML = route.template;
 
-            const applyBtn = document.getElementById('apply-multiply');
-            if (applyBtn) {
-                applyBtn.addEventListener('click', () => {
-                    this.updateInfo();
-                    this.allLogic();
-                });
-            }
+            this.bindApplyButton();
 
             if (route.init) route.init.call(this);
+        }
+    },
+
+    bindApplyButton() {
+        const applyBtn = document.getElementById('apply-multiply');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                this.cleanupPreviousMode(true);
+                this.currentLevel = parseInt(document.getElementById('power').value);
+                this.updateInfo();
+                this.allLogic();
+            });
         }
     },
 
@@ -117,19 +183,23 @@ export const Router = {
             showErrorCreateGraphMessage();
             return;
         }
+        
+        this.prepareLevel();
+    },
 
+    prepareLevel() {
         this.answerGraph = new Graph;
         this.answerGraph.clone(AppState.graph);
 
         switch(this.multiplyType){
             case 'classic':
-                this.answerGraph.classicMultiply(this.power);
+                this.answerGraph.classicMultiply(this.currentLevel);
                 break;
             case 'logical':
-                this.answerGraph.logicalMultiply(this.power);
+                this.answerGraph.logicalMultiply(this.currentLevel);
                 break;
             case 'tropical':
-                this.answerGraph.tropicalMultiply(this.power);
+                this.answerGraph.tropicalMultiply(this.currentLevel);
                 break;
         }
 
@@ -143,48 +213,135 @@ export const Router = {
         this.showCurrentMode();
     },
 
-    demonstrationLogic() {
-        if (window.currentAnimation) {
-            clearTimeout(window.currentAnimation);
+    initDemonstrationLevel() {
+        const row = document.querySelector(`.level-row[data-level="${this.currentLevel}"]`);
+        
+        renderMatrixDemonstration(this.newGraph, row, this.answerGraph);
+        const checkGood = () => {
+            if (checkMatrixCompletion(this.newGraph.Matrix, this.answerGraph.Matrix)) {
+                this.cleanElements();
+                this.addToStorage();
+                this.currentLevel++;
+                if (this.currentLevel - 1 < this.maxLevel) {
+                    this.printNext();
+                    this.initDemonstrationLevel();
+                } 
+                else {
+                    renderMatrix(this.answerGraph, row.querySelector('.result-matrix-container'), true);
+                }
+                return;
+            }
+            setTimeout(checkGood, 1000);
         }
-
-        renderMatrixDemonstration(this.newGraph, "new-matrix-container", this.answerGraph);
-        displayGraph(this.newGraph, "new-graph-container", this.answerGraph);
+        checkGood()
     },
 
-    trainingLogic() {
-        renderMatrixTraining(this.newGraph, "new-matrix-container", this.answerGraph);
-        displayGraph(this.newGraph, "new-graph-container", this.answerGraph)
+    initTrainingLevel() {
+        const row = document.querySelector(`.level-row[data-level="${this.currentLevel}"]`);
+        
+        renderMatrixTraining(this.newGraph, row, this.answerGraph, () => {
+            this.addToStorage();
+            this.currentLevel++;
+            if (this.currentLevel - 1 < this.maxLevel) {
+                this.printNext()
+                this.initTrainingLevel();
+            }
+        });
     },
 
-    checkLogic() {
-        renderMatrixCheck(this.newGraph, "new-matrix-container", this.answerGraph);
-        displayGraph(this.newGraph, "new-graph-container")
+    initCheckLevel() {
+        const row = document.querySelector(`.level-row[data-level="${this.currentLevel}"]`);
+        const checkButton = row.querySelector('.check-answer');
+        
+        renderMatrixCheck(this.newGraph, row, this.answerGraph);
+        checkButton.removeEventListener('click', this.handleCheckClick);
+
+        this.handleCheckClick = () => {
+            document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
+
+            const isCorrect = checkMatrixCompletion(this.newGraph.Matrix, this.answerGraph.Matrix);
+
+            if (isCorrect) {
+                showCompletionMessage();
+                this.cleanElements();
+                lockMatrixInputs(row.querySelector('.result-matrix-container'));
+                this.addToStorage();
+                this.currentLevel++;
+                if (this.currentLevel - 1 < this.maxLevel) {
+                    this.printNext();
+                    this.initCheckLevel();
+                }
+            } else {
+                showFailMessage();
+            }
+        };
+
+        checkButton.addEventListener('click', this.handleCheckClick);
+    },
+
+    printNext() {
+        const levelsContainer = document.getElementById('levels-container');
+        levelsContainer.innerHTML = '';
+
+        this.updateInfo();
+        this.prepareLevel();
+
+        this.outputStorage();
+    },
+
+    getMultiplyTypeName() {
+        switch(this.multiplyType) {
+            case 'classic': return "Классическое";
+            case 'logical': return "Логическое";
+            case 'tropical': return "Тропическое";
+            default: return "";
+        }
     },
 
     clearGraphs() {
         this.newGraph = null;
         this.answerGraph = null;
-        document.getElementById("new-text-container").textContent = "";
     },
 
     updateInfo() {
         this.multiplyType = document.getElementById('multiply-type').value;
-        this.power = parseInt(document.getElementById('power').value);
-
-        let type = "";
-        switch (this.multiplyType){
-            case 'classic':
-                type = "Классическое";
-                break;
-            case 'logical':
-                type = "Логическое";
-                break;
-            case 'tropical':
-                type = "Тропическое";
-                break;
-        }
-
-        this.currentInfo = "Тип умножения: " + type + "\nСтепень: " + String(this.power); 
+        this.power = document.getElementById('power').value;
+        this.currentInfo = this.getLevelInfo(this.currentLevel);
     },
+
+    addToStorage() {
+        if (this.storedLevels.length < this.maxLevel && this.currentLevel <= this.maxLevel){
+            const storedGraph = new Graph();
+            storedGraph.clone(this.answerGraph);
+            const currentLevel = this.currentLevel;
+            this.storedLevels.push({currentLevel, storedGraph});
+        }
+    },
+
+    outputStorage() {
+        const levelsContainer = document.getElementById('levels-container');
+        
+        [...this.storedLevels].reverse().forEach(level => {
+            const { currentLevel, storedGraph } = level;
+            
+            const row = document.createElement('div');
+            row.className = 'level-row';
+            row.dataset.level = currentLevel;
+
+            row.innerHTML = resultRowTemplate;
+            
+            const textContainer = row.querySelector('.result-text-container');
+            textContainer.textContent = this.getLevelInfo(currentLevel);
+            
+            renderMatrix(storedGraph, row.querySelector('.result-matrix-container'), true);
+            displayGraph(storedGraph, row.querySelector('.result-graph-container'));
+            
+            levelsContainer.appendChild(row);
+        });
+    },
+
+    getLevelInfo(level) {
+        const typeName = this.getMultiplyTypeName();
+        return `Тип умножения: ${typeName}\nСтепень: ${level}`;
+    }
 };

@@ -1,4 +1,5 @@
 export const showCompletionMessage = () => {
+    document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
     const completeMessage = document.createElement('div');
     completeMessage.className = 'completion-message';
     completeMessage.textContent = '✅Задание выполнено верно!';
@@ -6,6 +7,7 @@ export const showCompletionMessage = () => {
 };
 
 export const showFailMessage = () => {
+    document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
     const failMessage = document.createElement('div');
     failMessage.className = 'fail-message';
     failMessage.textContent = '❌Задание выполнено неверно!';
@@ -13,6 +15,7 @@ export const showFailMessage = () => {
 };
 
 export const showErrorSelectMessage = () => {
+    document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
     const completeMessage = document.createElement('div');
     completeMessage.className = 'error-message';
     completeMessage.textContent = 'Для создания графа выберите его параметры';
@@ -20,6 +23,7 @@ export const showErrorSelectMessage = () => {
 };
 
 export const showErrorCreateGraphMessage = () => {
+    document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
     const failMessage = document.createElement('div');
     failMessage.className = 'error-message';
     failMessage.textContent = 'Вначале создайте граф';

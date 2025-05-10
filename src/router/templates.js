@@ -19,15 +19,7 @@ export const demonstrationTemplate = `
         <button id="apply-multiply" class="button">Применить</button>
     </div>
     
-    <div class="result-row">
-        <div id="new-text-container" class="result-item"></div>
-        <div id="new-matrix-container" class="result-item"></div>
-        <div id="new-graph-container" class="result-item"></div>
-        <div class ="range-speed">
-            <label class="range-label hidden" for="range" display="none">Скорость</label>
-            <input type="range" id="speed-control" min="200" max="3000" value="2000" class="range-input hidden">
-        </div>
-    </div>
+    <div id="levels-container"></div>
 `;
 
 export const trainingTemplate = `
@@ -51,11 +43,7 @@ export const trainingTemplate = `
         <button id="apply-multiply" class="button">Применить</button>
     </div>
 
-    <div class="result-row">
-        <div id="new-text-container" class="result-item"></div>
-        <div id="new-matrix-container" class="result-item"></div>
-        <div id="new-graph-container" class="result-item"></div>
-    </div>
+    <div id="levels-container"></div>
 `;
 
 export const checkTemplate = `
@@ -79,10 +67,5 @@ export const checkTemplate = `
         <button id="apply-multiply" class="button">Применить</button>
     </div>
 
-    <div class="result-row">
-        <div id="new-text-container" class="result-item"></div>
-        <div id="new-matrix-container" class="result-item"></div>
-        <div id="new-graph-container" class="result-item"></div>
-        <button id="check-answer" class="hidden button">Проверить</button>
-    </div>
+    <div id="levels-container"></div>
 `;

@@ -1,0 +1,76 @@
+.range-label {
+  padding-left: 60px;
+}
+
+.range-speed {
+  display: grid;
+  gap: 20px;
+  width: 200px;
+}
+
+.speed-control {
+  accent-color: #3f8534;
+}
+
+.speed-control {
+  appearance: none;
+  height: 15px;
+}
+
+.speed-control::-webkit-slider-runnable-track {
+  box-sizing: border-box;
+  height: 15px;
+  background-color: #e3f8d8;
+}
+
+.speed-control::-moz-range-track {
+  box-sizing: border-box;
+  background-color: #3f8534;
+}
+
+.speed-control::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  margin-top: -7.5px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 5px inset #3f8534;
+  transition: 300ms;
+}
+
+.speed-control::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  margin-top: 0;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 5px inset #3f8534;
+  transition: 300ms;
+}
+
+
+
+.speed-control:focus-visible {
+  outline-offset: 10px;
+  outline: 1px solid #3f8534;
+}
+
+.speed-control:hover::-webkit-slider-thumb,
+.speed-control:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 10px inset #3f8534;
+}
+
+.speed-control:hover::-moz-range-thumb,
+.speed-control:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 10px inset #3f8534;
+}
+
+.speed-control:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 30px inset #3f8534;
+}
+.speed-control:active::-moz-range-thumb {
+  box-shadow: 0 0 0 30px inset #3f8534;
+}
