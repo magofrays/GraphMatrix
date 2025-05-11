@@ -132,6 +132,7 @@ class Graph {
             edgesAdded++;
         }
     }
+
     neighbors(idx) {
         let result = [];
         for (let i = 0; i < this.matrix[idx].length; i++) {
@@ -141,6 +142,7 @@ class Graph {
         }
         return result;
     }
+
     countEdges() {
         let edgeNumber = 0;
         for (let row of this.matrix) {
@@ -152,6 +154,7 @@ class Graph {
         }
         return edgeNumber;
     }
+
     countWeights() {
         let sumWeights = 0;
         for (let row of this.matrix) {
@@ -177,6 +180,7 @@ class Graph {
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
+        this.GenType = this.defineType();
     }
 
     logicalMultiply(power) {
@@ -192,6 +196,7 @@ class Graph {
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
+        this.GenType = this.defineType();
     }
 
     tropicalMultiply(power) {
@@ -207,6 +212,37 @@ class Graph {
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
+        this.GenType = this.defineType();
+    }
+
+    defineType() {
+        let symmetrical = true;
+        let antiSymmetrical = true;
+        let asymmetrical = true;
+        for (let y = 0; y != this.size; y++) {
+            for (let x = 0; x != y + 1; x++) {
+                if (y == x && matrix[y][x]) {
+                    asymmetrical = false;
+                }
+                if (y != x && this.matrix[y][x] == this.matrix[x][y]) {
+                    antiSymmetrical = false;
+                }
+                if (this.matrix[y][x] != this.matrix[x][y]) {
+                    symmetrical = false;
+                }
+                if (!antiSymmetrical && !symmetrical && !asymmetrical) {
+                    return GraphGenerationType.DEFAULT;
+                }
+            }
+        }
+        if (symmetrical) {
+            return GraphGenerationType.SYMMETRICAL;
+        } else if (antiSymmetrical) {
+            return GraphGenerationType.ANTISYMMETRICAL;
+        } else if (asymmetrical) {
+            return GraphGenerationType.ASYMMETRICAL;
+        }
+        return GraphGenerationType.DEFAULT;
     }
 
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
