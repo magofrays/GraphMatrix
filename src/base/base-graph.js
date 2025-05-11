@@ -9,8 +9,7 @@ const GraphGenerationType = Object.freeze({
     DEFAULT : 'DEFAULT',
     SYMMETRICAL : 'SYMM',
     ASYMMETRICAL : 'ASYMM',
-    ANTISYMMETRICAL : 'ANTISYMM',
-    UNKNOWN : 'UNKNOWN'
+    ANTISYMMETRICAL : 'ANTISYMM'
 });
 
 class Graph {
@@ -122,6 +121,7 @@ class Graph {
     }
 
     generateAsymmetrical() {
+        let edgesAdded = 0;
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
@@ -176,11 +176,10 @@ class Graph {
             newMatrix = classicMatrixMultiply(newMatrix, this.matrix);
         }
         this.matrix = newMatrix;
-        this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
-        this.GenType = this.defineType();
+        this.genType = this.defineType();
     }
 
     logicalMultiply(power) {
@@ -192,11 +191,10 @@ class Graph {
             newMatrix = logicalMatrixMultiply(newMatrix, this.matrix);
         }
         this.matrix = newMatrix;
-        this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
-        this.GenType = this.defineType();
+        this.genType = this.defineType();
     }
 
     tropicalMultiply(power) {
@@ -208,11 +206,10 @@ class Graph {
             newMatrix = tropicalMatrixMultiply(newMatrix, this.matrix);
         }
         this.matrix = newMatrix;
-        this.genType = GraphGenerationType.UNKNOWN;
         this.edgeNumber = this.countEdges();
         this.sumWeights = this.countWeights();
         this.connectedComponents = this.findConnectedComponents();
-        this.GenType = this.defineType();
+        this.genType = this.defineType();
     }
 
     defineType() {
@@ -221,7 +218,7 @@ class Graph {
         let asymmetrical = true;
         for (let y = 0; y != this.size; y++) {
             for (let x = 0; x != y + 1; x++) {
-                if (y == x && matrix[y][x]) {
+                if (y == x && this.matrix[y][x]) {
                     asymmetrical = false;
                 }
                 if (y != x && this.matrix[y][x] == this.matrix[x][y]) {
