@@ -1,102 +1,95 @@
-import { showCompletionMessage} from "./messages.js";
+import {showCompletionMessage} from "./messages.js";
 
 function createGraphFromMatrix(graph, answerGraph = null, isStart = false) {
     const nodes = new vis.DataSet([]);
     const edges = new vis.DataSet([]);
-    
+
     const matrix = graph.Matrix;
     for (let i = 0; i < matrix.length; i++) {
         nodes.add({
-            id: i,
-            label: `${i}`,
+            id : i,
+            label : `${i}`,
         });
     }
-    
+
     const graphType = graph.GenType;
     let border = matrix.length;
     let addColor = "white";
-    if (isStart){
+    if (isStart) {
         addColor = "#f9f9f9";
     }
     for (let i = 0; i < matrix.length; i++) {
         edges.add({
-            from: i,
-            to: i,
-            color: {color: addColor},
+            from : i,
+            to : i,
+            color : {color : addColor},
         });
     }
     for (let i = 0; i < matrix.length; i++) {
-        if (graphType === "SYMM"){
+        if (graphType === "SYMM") {
             border = i + 1;
         }
         for (let j = 0; j < border; j++) {
             if (matrix[i][j] > 0) {
                 let currentColor = "#3f8534";
-                if (answerGraph && answerGraph.Matrix[i][j] != matrix[i][j]){
+                if (answerGraph && answerGraph.Matrix[i][j] != matrix[i][j]) {
                     currentColor = "#FF4500";
                 }
-                if (graphType === "SYMM"){
-                    if (matrix[i][j] > 1){
-                        edges.add({
-                            from: i,
-                            to: j,
-                            color: {color: currentColor},
-                            label: String(matrix[i][j]),
-                            font: {color: currentColor}
-                        });
-                    }
-                    else {
-                        edges.add({
-                            from: i,
-                            to: j,
-                            color: {color: currentColor}
-                        });
-                    }
-                }
-                else{
+                if (graphType === "SYMM") {
                     if (matrix[i][j] > 1) {
                         edges.add({
-                            from: i,
-                            to: j,
-                            arrows: 'to',
-                            color: {color: currentColor},
-                            label: String(matrix[i][j]),
-                            font: {color: currentColor}
+                            from : i,
+                            to : j,
+                            color : {color : currentColor},
+                            label : String(matrix[i][j]),
+                            font : {color : currentColor}
                         });
+                    } else {
+                        edges.add(
+                            {from : i, to : j, color : {color : currentColor}});
                     }
-                    else {
+                } else {
+                    if (matrix[i][j] > 1) {
                         edges.add({
-                            from: i,
-                            to: j,
-                            arrows: 'to',
-                            color: {color: currentColor}
+                            from : i,
+                            to : j,
+                            arrows : 'to',
+                            color : {color : currentColor},
+                            label : String(matrix[i][j]),
+                            font : {color : currentColor}
+                        });
+                    } else {
+                        edges.add({
+                            from : i,
+                            to : j,
+                            arrows : 'to',
+                            color : {color : currentColor}
                         });
                     }
                 }
             }
         }
     }
-    
-    return { nodes, edges };
-}
 
+    return {nodes, edges};
+}
 
 export function renderMatrix(graph, containerId, isTrue = false) {
     let container = containerId;
-    if (containerId instanceof HTMLElement){
+    if (containerId instanceof HTMLElement) {
         container = containerId;
-    }
-    else {
+    } else {
         container = document.getElementById(containerId);
     }
-    if (!container) return;
+    if (!container)
+        return;
 
     const table = document.createElement("table");
     table.className = "graph-matrix";
 
     const matrix = graph.Matrix;
     const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th")); 
+    headerRow.appendChild(document.createElement("th"));
 
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
@@ -112,8 +105,8 @@ export function renderMatrix(graph, containerId, isTrue = false) {
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
             td.textContent = matrix[i][j];
-            if (isTrue){
-                td.style.backgroundColor = "#e3f8d8"; 
+            if (isTrue) {
+                td.style.backgroundColor = "#e3f8d8";
             }
             row.appendChild(td);
         }
@@ -122,7 +115,6 @@ export function renderMatrix(graph, containerId, isTrue = false) {
     container.innerHTML = "";
     container.appendChild(table);
 }
-
 
 export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
     const matrixContainer = row.querySelector('.result-matrix-container');
@@ -153,30 +145,30 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
 
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
-            
+
             const input = document.createElement("input");
-            input.type = "text"; 
+            input.type = "text";
             input.maxLength = 1;
             input.dataset.row = i;
             input.dataset.col = j;
-            if (matrix[i][j] != -1){
+            if (matrix[i][j] != -1) {
                 input.value = matrix[i][j];
 
                 const correctValue = answerGraph.Matrix[i][j];
                 if (matrix[i][j] == correctValue) {
-                    input.style.backgroundColor = "#e3f8d8"; 
+                    input.style.backgroundColor = "#e3f8d8";
                 } else {
-                    input.style.backgroundColor = "#ffaaaa"; 
+                    input.style.backgroundColor = "#ffaaaa";
                 }
             }
-            
+
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
                 if (!/^\d*$/.test(value)) {
-                    e.target.value = value.replace(/[^\d]/g, ''); 
+                    e.target.value = value.replace(/[^\d]/g, '');
                 }
             });
-            
+
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
@@ -185,20 +177,21 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
 
                 const correctValue = answerGraph.Matrix[row][col];
                 if (value === correctValue) {
-                    e.target.style.backgroundColor = "#e3f8d8"; 
+                    e.target.style.backgroundColor = "#e3f8d8";
                 } else {
-                    e.target.style.backgroundColor = "#ffaaaa"; 
+                    e.target.style.backgroundColor = "#ffaaaa";
                 }
 
                 if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
                     showCompletionMessage();
                     lockMatrixInputs(matrixContainer);
-                    if (onComplete) onComplete();
+                    if (onComplete)
+                        onComplete();
                 }
-                
+
                 displayGraph(graph, graphContainer, answerGraph);
             });
-                
+
             td.appendChild(input);
             row.appendChild(td);
         }
@@ -214,11 +207,12 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
 export function clearResults() {
     const newMatrixContainer = document.getElementById('new-matrix-container');
     const newGraphContainer = document.getElementById('new-graph-container');
-    
-    if (newMatrixContainer) newMatrixContainer.innerHTML = '';
-    if (newGraphContainer) newGraphContainer.innerHTML = '';
-}
 
+    if (newMatrixContainer)
+        newMatrixContainer.innerHTML = '';
+    if (newGraphContainer)
+        newGraphContainer.innerHTML = '';
+}
 
 export function renderMatrixCheck(graph, row, answerGraph = null) {
     const matrixContainer = row.querySelector('.result-matrix-container');
@@ -230,7 +224,7 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
     const matrix = graph.Matrix;
 
     const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th")); 
+    headerRow.appendChild(document.createElement("th"));
 
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
@@ -248,32 +242,32 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
 
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
-            
+
             const input = document.createElement("input");
-            input.type = "text"; 
+            input.type = "text";
             input.maxLength = 1;
             input.dataset.row = i;
             input.dataset.col = j;
-            if (matrix[i][j] != -1){
+            if (matrix[i][j] != -1) {
                 input.value = matrix[i][j];
             }
-            
+
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
-                if (!/^\d*$/.test(value)) { 
-                    e.target.value = value.replace(/[^\d]/g, ''); 
+                if (!/^\d*$/.test(value)) {
+                    e.target.value = value.replace(/[^\d]/g, '');
                 }
             });
-            
+
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
                 const value = parseInt(e.target.value) || 0;
                 graph.changeEdge(row, col, value);
-                
+
                 displayGraph(graph, graphContainer);
             });
-            
+
             td.appendChild(input);
             row.appendChild(td);
         }
@@ -282,7 +276,7 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
     }
 
     displayGraph(graph, graphContainer);
-    matrixContainer.innerHTML = ""; 
+    matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
 }
 
@@ -302,7 +296,7 @@ export function renderMatrixDemonstration(graph, row, answerGraph = null) {
     const answerMatrix = answerGraph.Matrix;
 
     const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th")); 
+    headerRow.appendChild(document.createElement("th"));
 
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
@@ -317,10 +311,9 @@ export function renderMatrixDemonstration(graph, row, answerGraph = null) {
         row.appendChild(th);
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
-            if (matrix[i][j] != -1){
+            if (matrix[i][j] != -1) {
                 td.textContent = matrix[i][j];
-            }
-            else{
+            } else {
                 td.textContent = "";
             }
             row.appendChild(td);
@@ -331,34 +324,34 @@ export function renderMatrixDemonstration(graph, row, answerGraph = null) {
 
     const speedControl = row.querySelector('.speed-control');
     let speed = 3500 - parseInt(speedControl.value);
-    speedControl.addEventListener('input', () => {
-        speed = 3500 - parseInt(speedControl.value);
-    });
+    speedControl.addEventListener(
+        'input', () => { speed = 3500 - parseInt(speedControl.value); });
 
     let currentStep = 0;
     const totalSteps = matrix.length * matrix.length;
-    
+
     const animateStep = () => {
-        if (currentStep >= totalSteps) return;
-        
+        if (currentStep >= totalSteps)
+            return;
+
         const i = Math.floor(currentStep / matrix.length);
         const j = currentStep % matrix.length;
 
-        if (matrix[i][j] == answerMatrix[i][j]){
+        if (matrix[i][j] == answerMatrix[i][j]) {
             currentStep++;
             window.currentAnimation = setTimeout(animateStep, 0);
             return;
         }
-        
+
         const newValue = answerMatrix[i][j];
         graph.changeEdge(i, j, newValue);
-        table.rows[i+1].cells[j+1].textContent = newValue;
+        table.rows[i + 1].cells[j + 1].textContent = newValue;
         displayGraph(graph, graphContainer, answerGraph);
-        
+
         currentStep++;
         window.currentAnimation = setTimeout(animateStep, speed);
     };
-    
+
     animateStep();
 }
 
@@ -372,112 +365,87 @@ export function checkMatrixCompletion(userMatrix, correctMatrix) {
     }
     return true;
 }
-  
-export function displayGraph(graph, containerId, answerGraph = null, isStart = false) {
+
+export function displayGraph(graph, containerId, answerGraph = null,
+                             isStart = false) {
     const graphData = createGraphFromMatrix(graph, answerGraph, isStart);
     let container = containerId;
-    if (containerId instanceof HTMLElement){
+    if (containerId instanceof HTMLElement) {
         container = containerId;
-    }
-    else {
+    } else {
         container = document.getElementById(containerId);
     }
-    
-    container.style.width = '400px';
-    container.style.height = '400px'; 
 
-    const data = {
-        nodes: graphData.nodes,
-        edges: graphData.edges
-    };
-    
+    container.style.width = '400px';
+    container.style.height = '400px';
+
+    const data = {nodes : graphData.nodes, edges : graphData.edges};
+
     const options = {
-        layout: {
-            randomSeed: 42,
-            improvedLayout: false
-        },
-        physics: false,
-        nodes: {
-            size: 30,
-            font: {
-                size: 30,
-                face: 'Arial',       
-                align: 'center',      
+        layout : {randomSeed : 42, improvedLayout : false},
+        nodes : {
+            size : 30,
+            font : {
+                size : 30,
+                face : 'Arial',
+                align : 'center',
             },
-            fixed: {
-                x: true,
-                y: true,
-                physics: true // Полностью фиксируем узлы
+            fixed : {x : true, y : true},
+            physics : false,
+            shape : 'circle',
+            color : {
+                background : '#cbfbb1',
+                border : '#6a9f6a',
+                highlight : {background : '#cbfbb1', border : '#6a9f6a'}
             },
-            shape: 'circle',
-            color: {
-                background: '#cbfbb1',
-                border: '#6a9f6a',
-                highlight: {
-                    background: '#cbfbb1', // Отключаем изменение цвета при выделении
-                    border: '#6a9f6a'
-                }
+            borderWidth : 2,
+            borderWidthSelected : 2,
+            scaling : {min : 30, max : 30, label : {enabled : false}}
+        },
+        edges : {
+            selfReference : {
+                // Замена устаревшего selfReferenceSize
+                size : 20,          // Размер петли
+                angle : Math.PI / 4 // Угол расположения
             },
-            borderWidth: 2,
-            borderWidthSelected: 2, // Фиксируем ширину границы
-            scaling: {
-                min: 30, // Минимальный размер
-                max: 30, // Максимальный размер - такой же
-                label: {
-                    enabled: false // Отключаем масштабирование подписей
-                }
-            }
-        },
-        edges: {
-            selfReferenceSize: 20,
-            color: {
-                color: '#6a9f6a', 
-                opacity: 1.0,
-                highlight: '#6a9f6a'     
+            color : {color : '#6a9f6a', opacity : 1.0, highlight : '#6a9f6a'},
+            width : 3,
+            smooth : {type : 'continuous', roundness : 0.5},
+            font : {
+                size : 20,
+                strokeWidth : 5,
             },
-            width: 3,               
-            smooth: {                
-                type: 'continuous',
-                roundness: 0.5
-            },
-            font: {
-                size: 20,
-                strokeWidth:5, 
-            }
+            physics : false
         },
-        physics: {
-            enabled: false,
-            stabilization: {
-                enabled: true,
-                iterations: 100
-            }
+        physics : {
+            enabled : false,
+            stabilization : {enabled : true, iterations : 100}
         },
-        interaction: {
-            zoomView: false,
-            dragView: false,
-            dragNodes: false,
-            selectable: false, // Полностью отключаем возможность выделения
-            hover: false, // Отключаем эффекты при наведении
-            tooltipDelay: 0,
-            hideEdgesOnDrag: false,
-            hideNodesOnDrag: false
+        interaction : {
+            zoomView : false,
+            dragView : false,
+            dragNodes : false,
+            selectable : false,
+            hover : false,
+            tooltipDelay : 0,
+            hideEdgesOnDrag : false,
+            hideNodesOnDrag : false
         },
-        // initialZoom: 0.9,
-        width: '100%',
-        height: '100%',
-        autoResize: false 
+        width : '100%',
+        height : '100%',
+        autoResize : false
     };
 
     const nodeCount = data.nodes.length;
     const radius = 170;
-    const center = {x: 200, y: 200};
-    
+    const center = {x : 200, y : 200};
+
     data.nodes.forEach((node, i) => {
         const angle = (i * 2 * Math.PI) / nodeCount - 7;
         node.x = center.x + radius * Math.cos(angle);
         node.y = center.y + radius * Math.sin(angle);
     });
-        
+
     // new vis.Network(container, data, options);
 
     const network = new vis.Network(container, data, options);
@@ -485,21 +453,12 @@ export function displayGraph(graph, containerId, answerGraph = null, isStart = f
     // Принудительно устанавливаем одинаковый размер для всех узлов
     network.once('stabilizationIterationsDone', function() {
         network.setOptions({
-            nodes: {
-                size: 30,
-                    scaling: {
-                    min: 25,
-                    max: 25
-                },
-                font: {
-                    size: 30
-                }
-            }
+            nodes :
+                {size : 30, scaling : {min : 25, max : 25}, font : {size : 30}}
         });
         network.redraw();
     });
 }
-
 
 export function lockMatrixInputs(matrixContainer) {
     const inputs = matrixContainer.querySelectorAll('input[type="text"]');
