@@ -15,6 +15,7 @@ export const Router = {
     currentLevel: 1,
     maxLevel: 5,
     storedLevels: [],
+    multiplyType: "classic",
     
     routes: {
         '#demonstration': {
@@ -92,6 +93,12 @@ export const Router = {
         if (this.currentLevel == this.power) {
             appContainer.innerHTML = "";
             appContainer.innerHTML = this.getModeTemplate();
+
+            const multiplyTypeSelect = document.getElementById('multiply-type');
+            if (multiplyTypeSelect) {
+                multiplyTypeSelect.value = this.multiplyType;
+            }
+
             this.bindApplyButton();
         }
 
@@ -159,6 +166,11 @@ export const Router = {
             this.cleanupPreviousMode();
 
             document.getElementById('app').innerHTML = route.template;
+
+            const multiplyTypeSelect = document.getElementById('multiply-type');
+            if (multiplyTypeSelect) {
+                multiplyTypeSelect.value = this.multiplyType;
+            }
 
             this.bindApplyButton();
 
@@ -289,8 +301,8 @@ export const Router = {
         this.outputStorage();
     },
 
-    getMultiplyTypeName() {
-        switch(this.multiplyType) {
+    getMultiplyTypeName(multiplyType) {
+        switch(multiplyType) {
             case 'classic': return "Классическое";
             case 'logical': return "Логическое";
             case 'tropical': return "Тропическое";
@@ -314,7 +326,8 @@ export const Router = {
             const storedGraph = new Graph();
             storedGraph.clone(this.answerGraph);
             const currentLevel = this.currentLevel;
-            this.storedLevels.push({currentLevel, storedGraph});
+            const multiplyType = this.multiplyType; 
+            this.storedLevels.push({currentLevel, storedGraph, multiplyType});
         }
     },
 
@@ -322,7 +335,7 @@ export const Router = {
         const levelsContainer = document.getElementById('levels-container');
         
         [...this.storedLevels].reverse().forEach(level => {
-            const { currentLevel, storedGraph } = level;
+            const { currentLevel, storedGraph, multiplyType  } = level;
             
             const row = document.createElement('div');
             row.className = 'level-row';
@@ -331,7 +344,7 @@ export const Router = {
             row.innerHTML = resultRowTemplate;
             
             const textContainer = row.querySelector('.result-text-container');
-            textContainer.textContent = this.getLevelInfo(currentLevel);
+            textContainer.textContent = this.getLevelInfo(currentLevel, multiplyType);
             
             renderMatrix(storedGraph, row.querySelector('.result-matrix-container'), true);
             displayGraph(storedGraph, row.querySelector('.result-graph-container'));
@@ -340,8 +353,8 @@ export const Router = {
         });
     },
 
-    getLevelInfo(level) {
-        const typeName = this.getMultiplyTypeName();
+    getLevelInfo(level, multiplyType = this.multiplyType) {
+        const typeName = this.getMultiplyTypeName(multiplyType);
         return `Тип умножения: ${typeName}\nСтепень: ${level}`;
     }
 };
