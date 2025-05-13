@@ -69,7 +69,7 @@ export const Router = {
 
             this.bindApplyButton();
 
-            if (route.init) route.init.call(this);
+            route.init();
         }
     },
 
@@ -80,7 +80,7 @@ export const Router = {
                 this.cleanupPreviousMode(true);
                 this.currentLevel = parseInt(document.getElementById('power').value);
                 this.updateInfo();
-                this.allLogic();
+                this.prepareLevel();
             });
         }
     },
@@ -146,7 +146,7 @@ export const Router = {
         }
     },
 
-    showCurrentMode(isStorage = false) {
+    showCurrentMode() {
         const appContainer = document.getElementById('app');
         if (this.currentLevel == this.power) {
             appContainer.innerHTML = "";
@@ -171,18 +171,16 @@ export const Router = {
             this.addLevelRow(levelsContainer);
         }
 
-        if (!isStorage){
-            switch (this.currentMode) {
-                case 'demonstration':
-                    this.initDemonstrationLevel();
-                    break;
-                case 'training':
-                    this.initTrainingLevel();
-                    break;
-                case 'check':
-                    this.initCheckLevel();
-                    break;
-            }
+        switch (this.currentMode) {
+            case 'demonstration':
+                this.initDemonstrationLevel();
+                break;
+            case 'training':
+                this.initTrainingLevel();
+                break;
+            case 'check':
+                this.initCheckLevel();
+                break;
         }
     },
 
@@ -207,16 +205,12 @@ export const Router = {
         container.appendChild(row);
     },
 
-    allLogic() {        
+    prepareLevel() {
         if (!AppState.graph) {
             showErrorCreateGraphMessage();
             return;
         }
-        
-        this.prepareLevel();
-    },
 
-    prepareLevel() {
         this.answerGraph = new Graph;
         this.answerGraph.clone(AppState.graph);
 
@@ -333,17 +327,7 @@ export const Router = {
     },
 
     nextLevelApply(row){
-        if (window.currentAnimation) {
-            clearTimeout(window.currentAnimation);
-            window.currentAnimation = null;
-        }
-
         this.isNext = true;
-
-        const button = document.querySelector('.next-level-button')
-        if (button){
-            this.cleanNextLevelButton();
-        }
 
         const nextLevelButton = document.createElement('button');
         nextLevelButton.textContent = 'Следующая степень';

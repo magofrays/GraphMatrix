@@ -172,7 +172,7 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-                const value = parseInt(e.target.value) || 0;
+                const value = parseInt(e.target.value) || -1;
                 graph.changeEdge(row, col, value);
 
                 const correctValue = answerGraph.Matrix[row][col];
@@ -268,7 +268,7 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-                const value = parseInt(e.target.value) || 0;
+                const value = parseInt(e.target.value) || -1;
                 graph.changeEdge(row, col, value);
 
                 displayGraph(graph, graphContainer);
