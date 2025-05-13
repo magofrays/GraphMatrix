@@ -118,6 +118,10 @@ body {
   margin-bottom: 10px;
 }
 
+.next-level-button {
+  margin-left: 20px;
+}
+
 
 .graph-matrix input[type="text"] {
   width: 100%;

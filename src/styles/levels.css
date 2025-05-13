@@ -1,7 +1,7 @@
 .level-row {
     margin-bottom: 40px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #3f8534;
 }
 
 .level-row:last-child {
@@ -24,8 +24,7 @@
   flex-direction: row; 
   gap: 20px;          
   align-items: flex-start; 
-  margin-top: 50px;
-  margin-left: 20px;
+  /* margin-top: 50px; */
 }
 
 .result-matrix-container {
@@ -36,6 +35,10 @@
   flex: 0 0 450px;
   width: 450px;
   height: 450px;
+<<<<<<< HEAD
+=======
+  margin-left: 20px;
+>>>>>>> remove_unnecessary
 } 
 
 .result-text-container {
