@@ -148,7 +148,7 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
 
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;
+            input.maxLength = 4;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
@@ -202,6 +202,12 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
     displayGraph(graph, graphContainer, answerGraph);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
+
+    if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
+        lockMatrixInputs(matrixContainer);
+        if (onComplete)
+            onComplete();
+    }
 }
 
 export function clearResults() {
@@ -245,7 +251,7 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
 
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 1;
+            input.maxLength = 4;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
@@ -376,8 +382,8 @@ export function displayGraph(graph, containerId, answerGraph = null,
         container = document.getElementById(containerId);
     }
 
-    container.style.width = '400px';
-    container.style.height = '400px';
+    container.style.width = '450px';
+    container.style.height = '450px';
 
     const data = {nodes : graphData.nodes, edges : graphData.edges};
 
@@ -404,9 +410,8 @@ export function displayGraph(graph, containerId, answerGraph = null,
         },
         edges : {
             selfReference : {
-                // Замена устаревшего selfReferenceSize
-                size : 20,          // Размер петли
-                angle : Math.PI / 4 // Угол расположения
+                size : 20,
+                angle : Math.PI / 4
             },
             color : {color : '#6a9f6a', opacity : 1.0, highlight : '#6a9f6a'},
             width : 3,
@@ -438,7 +443,7 @@ export function displayGraph(graph, containerId, answerGraph = null,
 
     const nodeCount = data.nodes.length;
     const radius = 170;
-    const center = {x : 200, y : 200};
+    const center = {x : 200, y : 210};
 
     data.nodes.forEach((node, i) => {
         const angle = (i * 2 * Math.PI) / nodeCount - 7;
@@ -446,11 +451,8 @@ export function displayGraph(graph, containerId, answerGraph = null,
         node.y = center.y + radius * Math.sin(angle);
     });
 
-    // new vis.Network(container, data, options);
-
     const network = new vis.Network(container, data, options);
 
-    // Принудительно устанавливаем одинаковый размер для всех узлов
     network.once('stabilizationIterationsDone', function() {
         network.setOptions({
             nodes :

@@ -4,7 +4,7 @@ export function loadRangeSliderStyles() {
     const link = document.createElement('link');
     link.id = 'range-slider-styles';
     link.rel = 'stylesheet';
-    link.href = '../styles/speed-slider.css';
+    link.href = './styles/speed-slider.css';
     
     document.head.appendChild(link);
 }
@@ -15,7 +15,7 @@ export function loadModeControlsStyles() {
     const link = document.createElement('link');
     link.id = 'mode-controls-styles';
     link.rel = 'stylesheet';
-    link.href = '../styles/mode-controls.css';
+    link.href = './styles/mode-controls.css';
     
     document.head.appendChild(link);
 }
@@ -26,7 +26,7 @@ export function loadMessagesStyles() {
     const link = document.createElement('link');
     link.id = 'messages-styles';
     link.rel = 'stylesheet';
-    link.href = '../styles/messages.css';
+    link.href = './styles/messages.css';
     
     document.head.appendChild(link);
 }
@@ -37,7 +37,7 @@ export function loadLevelsStyles() {
     const link = document.createElement('link');
     link.id = 'levels-styles';
     link.rel = 'stylesheet';
-    link.href = '../styles/levels.css';
+    link.href = './styles/levels.css';
     
     document.head.appendChild(link);
 }
