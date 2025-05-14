@@ -407,11 +407,7 @@ export const Router = {
             this.currentLevel - 1 <= this.maxLevel) {
             const storedGraph = new Graph();
             storedGraph.clone(this.answerGraph);
-<<<<<<< HEAD
-            const currentLevel = this.currentLevel;
-=======
             const currentLevel = this.currentLevel - 1;
->>>>>>> remove_unnecessary
             const multiplyType = this.multiplyType;
             this.storedLevels.push({currentLevel, storedGraph, multiplyType});
         }
