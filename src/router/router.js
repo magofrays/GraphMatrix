@@ -27,7 +27,7 @@ import {
 } from "./templates.js";
 
 export const Router = {
-    currentMode : null,
+    currentRoute : null,
     newGraph : null,
     answerGraph : null,
     animationId : null,
@@ -36,110 +36,81 @@ export const Router = {
     maxLevel : 5,
     storedLevels : [],
     multiplyType : "classic",
+    isApplied : false,
 
     routes : {
         '#demonstration' : {
             template : demonstrationTemplate,
-            init : function() {
-                Router.currentMode = 'demonstration';
-                Router.cleanupPreviousMode();
-                Router.initializeMode();
-            }
+            mode : 'demonstration',
+            rowTemplate : resultRowWithControlsTemplate,
+            initLevel() { Router.initDemonstrationLevel();}
         },
         '#training' : {
             template : trainingTemplate,
-            init : function() {
-                Router.currentMode = 'training';
-                Router.cleanupPreviousMode();
-                Router.initializeMode();
-            }
+            mode : 'training',
+            rowTemplate : resultRowTemplate,
+            initLevel() { Router.initTrainingLevel();}
         },
         '#check' : {
             template : checkTemplate,
-            init : function() {
-                Router.currentMode = 'check';
-                Router.cleanupPreviousMode();
-                Router.initializeMode();
-            }
+            mode : 'check',
+            rowTemplate : resultRowWithCheckTemplate,
+            initLevel() { Router.initCheckLevel();}
         }
     },
 
     init() {
-        this.setupNavigation();
+        window.addEventListener('hashchange', () => this.loadRoute());
         this.loadRoute();
     },
 
-    setupNavigation() {
-        window.addEventListener('hashchange', () => this.loadRoute());
-    },
-
     loadRoute() {
+        this.isApplied = false;
         const hash = window.location.hash || '#demonstration';
         const route = this.routes[hash];
-
-        if (route) {
-            this.cleanupPreviousMode();
-
-            document.getElementById('app').innerHTML = route.template;
-
-            const multiplyTypeSelect = document.getElementById('multiply-type');
-            if (multiplyTypeSelect) {
-                multiplyTypeSelect.value = this.multiplyType;
-            }
-
-            this.bindApplyButton();
-
-            route.init();
-        }
+        this.cleanupPreviousMode();
+        this.currentRoute = route;
+        document.getElementById('app').innerHTML = route.template;
+        const multiplyTypeSelect = document.getElementById('multiply-type');
+        multiplyTypeSelect.value = this.multiplyType;
+        this.initializeMode();
+        this.bindApplyButton();
     },
 
     bindApplyButton() {
         const applyBtn = document.getElementById('apply-multiply');
-        if (applyBtn) {
-            applyBtn.addEventListener('click', () => {
-                this.cleanupPreviousMode(true);
-                this.currentLevel =
-                    parseInt(document.getElementById('power').value);
-                this.updateInfo();
-                this.prepareLevel();
-            });
-        }
+
+        applyBtn.addEventListener('click', () => {
+            if (!AppState.graph) {
+                showErrorCreateGraphMessage();
+                return;
+            }
+            this.cleanupPreviousMode(true);
+            this.updateInfo();
+            this.currentLevel = parseInt(this.power);
+            this.createTestMatrices();
+            this.showCurrentMode();
+            this.isApplied = true;
+        });
     },
 
-    getModeTemplate() {
-        switch (this.currentMode) {
-        case 'demonstration':
-            return demonstrationTemplate;
-        case 'training':
-            return trainingTemplate;
-        case 'check':
-            return checkTemplate;
-        default:
-            return demonstrationTemplate;
-        }
-    },
-
-    cleanNextLevelButton() {
-        document.querySelectorAll('.next-level-button')
-            .forEach(btn => btn.remove());
-    },
-
-    cleanElements(isNext = false) {
+    cleanElements(deleteNext = false) {
         document.querySelectorAll('.check-answer').forEach(btn => btn.remove());
         document.querySelectorAll('.speed-control')
             .forEach(ctrl => ctrl.remove());
         document.querySelectorAll('.range-label')
             .forEach(label => label.remove());
-        if (isNext)
-            this.cleanNextLevelButton();
+        if (deleteNext) {
+            document.querySelectorAll('.next-level-button')
+                .forEach(btn => btn.remove());
+        }
     },
 
-    cleanupPreviousMode(isApply = false) {
-        if (isApply) {
+    cleanupPreviousMode(clearLevels = false) {
+        if (clearLevels) {
             this.storedLevels = [];
             this.isNext = false;
         }
-
         if (window.currentAnimation) {
             clearTimeout(window.currentAnimation);
         }
@@ -151,7 +122,6 @@ export const Router = {
         if (levelsContainer) {
             levelsContainer.innerHTML = '';
         }
-
         this.cleanElements(true);
     },
 
@@ -166,78 +136,33 @@ export const Router = {
                 const row = document.querySelector(
                     `.level-row[data-level="${this.currentLevel}"]`);
                 if (row) {
-                    this.nextLevelApply(row);
+                    this.createNextLevelButton(row);
                 }
             }
         }
     },
 
     showCurrentMode() {
-        const appContainer = document.getElementById('app');
-        if (this.currentLevel == this.power) {
-            appContainer.innerHTML = "";
-            appContainer.innerHTML = this.getModeTemplate();
-
-            const multiplyTypeSelect = document.getElementById('multiply-type');
-            if (multiplyTypeSelect) {
-                multiplyTypeSelect.value = this.multiplyType;
-            }
-
-            this.bindApplyButton();
-        }
-
         let levelsContainer = document.getElementById('levels-container');
-        if (!levelsContainer) {
-            levelsContainer = document.createElement('div');
-            levelsContainer.id = 'levels-container';
-            appContainer.appendChild(levelsContainer);
-        }
-
         if (!document.querySelector(
                 `.level-row[data-level="${this.currentLevel}"]`)) {
             this.addLevelRow(levelsContainer);
         }
-
-        switch (this.currentMode) {
-        case 'demonstration':
-            this.initDemonstrationLevel();
-            break;
-        case 'training':
-            this.initTrainingLevel();
-            break;
-        case 'check':
-            this.initCheckLevel();
-            break;
-        }
+        this.currentRoute.initLevel();
     },
 
     addLevelRow(container) {
-        let rowTemplate;
-        if (this.currentMode === 'demonstration') {
-            rowTemplate = resultRowWithControlsTemplate;
-        } else if (this.currentMode === 'check') {
-            rowTemplate = resultRowWithCheckTemplate;
-        } else {
-            rowTemplate = resultRowTemplate;
-        }
-
+        let rowTemplate = this.currentRoute.rowTemplate;
         const row = document.createElement('div');
         row.className = 'level-row';
         row.dataset.level = this.currentLevel;
         row.innerHTML = rowTemplate;
-
         const textContainer = row.querySelector('.result-text-container');
         textContainer.textContent = this.currentInfo;
-
         container.appendChild(row);
     },
 
-    prepareLevel() {
-        if (!AppState.graph) {
-            showErrorCreateGraphMessage();
-            return;
-        }
-
+    createTestMatrices() {
         this.answerGraph = new Graph;
         this.answerGraph.clone(AppState.graph);
 
@@ -259,8 +184,6 @@ export const Router = {
                 this.newGraph.changeEdge(i, j, -1);
             }
         }
-
-        this.showCurrentMode();
     },
 
     initDemonstrationLevel() {
@@ -270,9 +193,8 @@ export const Router = {
 
         renderMatrixDemonstration(this.newGraph, row, this.answerGraph);
         if (this.isNext) {
-            this.cleanElements(true);
             if (this.currentLevel - 1 < this.maxLevel) {
-                this.nextLevelApply(row);
+                this.createNextLevelButton(row);
             } else {
                 this.addToStorage();
             }
@@ -283,7 +205,7 @@ export const Router = {
                     this.cleanElements();
                     this.currentLevel = currentLevelBeforeChange + 1;
                     if (this.currentLevel - 1 < this.maxLevel) {
-                        this.nextLevelApply(row);
+                        this.createNextLevelButton(row);
                     } else {
                         this.addToStorage();
                         renderMatrix(
@@ -307,7 +229,7 @@ export const Router = {
             if (!this.isNext)
                 this.currentLevel++;
             if (this.currentLevel - 1 < this.maxLevel) {
-                this.nextLevelApply(row);
+                this.createNextLevelButton(row);
             } else {
                 this.addToStorage();
             }
@@ -323,9 +245,8 @@ export const Router = {
         checkButton.removeEventListener('click', this.handleCheckClick);
 
         if (this.isNext) {
-            this.cleanElements(true);
             if (this.currentLevel - 1 < this.maxLevel) {
-                this.nextLevelApply(row);
+                this.createNextLevelButton(row);
             } else {
                 this.addToStorage();
             }
@@ -344,7 +265,7 @@ export const Router = {
                         row.querySelector('.result-matrix-container'));
                     this.currentLevel++;
                     if (this.currentLevel - 1 < this.maxLevel) {
-                        this.nextLevelApply(row);
+                        this.createNextLevelButton(row);
                     } else {
                         this.addToStorage();
                     }
@@ -357,7 +278,7 @@ export const Router = {
         checkButton.addEventListener('click', this.handleCheckClick);
     },
 
-    nextLevelApply(row) {
+    createNextLevelButton(row) {
         this.isNext = true;
 
         const nextLevelButton = document.createElement('button');
@@ -376,10 +297,9 @@ export const Router = {
     printNext() {
         const levelsContainer = document.getElementById('levels-container');
         levelsContainer.innerHTML = '';
-
         this.updateInfo();
-        this.prepareLevel();
-
+        this.createTestMatrices();
+        this.showCurrentMode();
         this.outputStorage();
     },
 
@@ -397,9 +317,17 @@ export const Router = {
     },
 
     updateInfo() {
-        this.multiplyType = document.getElementById('multiply-type').value;
-        this.power = document.getElementById('power').value;
-        this.currentInfo = this.getLevelInfo(this.currentLevel);
+        if (!this.isApplied) {
+            this.multiplyType = document.getElementById('multiply-type').value;
+            this.power = document.getElementById('power').value;
+            this.currentInfo = this.getLevelInfo(this.power);
+        } else {
+            const level = this.storedLevels[this.storedLevels.length - 1];
+            console.log(level);
+            this.multiplyType = level.multiplyType;
+            this.power = level.currentLevel + 1;
+            this.currentInfo = this.getLevelInfo(this.power);
+        }
     },
 
     addToStorage() {
