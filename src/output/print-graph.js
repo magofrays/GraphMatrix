@@ -4,10 +4,10 @@ export function createContentWrapper(container) {
     if (!container)
         return;
     let contentWrapper =
-        container.querySelector(".content-wrapper"); // удаляем wrapper
+        container.querySelector(".content-wrapper");
     if (contentWrapper) {
         contentWrapper.remove()
-    } // создаем новый
+    } 
     container.insertAdjacentHTML('beforeend', `
                         <div class="content-wrapper" id="content-wrapper">
                             <div class="matrix-container"></div>
@@ -127,7 +127,6 @@ export function renderMatrix(graph, container, isTrue = false) {
 export function renderMatrixTraining(graph, container, answerGraph,
                                      onComplete) {
     const matrixContainer = container.querySelector('.matrix-container');
-    // const graphContainer = container.querySelector('.graph-container');
 
     matrixContainer.innerHTML = '';
     const table = document.createElement("table");
@@ -181,11 +180,17 @@ export function renderMatrixTraining(graph, container, answerGraph,
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-                const value = parseInt(e.target.value) || -1;
+
+                let value = e.target.value === '' ? -1 : parseInt(e.target.value);
+                if (isNaN(value)) value = -1;
+
                 graph.changeEdge(row, col, value);
 
                 const correctValue = answerGraph.Matrix[row][col];
-                if (value === correctValue) {
+                if (value == -1){
+                    e.target.style.backgroundColor = "#f9f9f9";
+                }
+                else if (value === correctValue) {
                     e.target.style.backgroundColor = "#e3f8d8";
                 } else {
                     e.target.style.backgroundColor = "#ffaaaa";
@@ -231,7 +236,6 @@ export function clearResults() {
 
 export function renderMatrixCheck(graph, container, answerGraph = null) {
     const matrixContainer = container.querySelector('.matrix-container');
-    // const graphContainer = container.querySelector('.graph-container');
 
     const table = document.createElement("table");
     table.className = "graph-matrix";
@@ -277,7 +281,10 @@ export function renderMatrixCheck(graph, container, answerGraph = null) {
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-                const value = parseInt(e.target.value) || -1;
+
+                let value = e.target.value === '' ? -1 : parseInt(e.target.value);
+                if (isNaN(value)) value = -1;
+
                 graph.changeEdge(row, col, value);
 
                 displayGraph(graph, container);
@@ -298,7 +305,6 @@ export function renderMatrixCheck(graph, container, answerGraph = null) {
 export function renderMatrixDemonstration(graph, container,
                                           answerGraph = null) {
     const matrixContainer = container.querySelector('.matrix-container');
-    // const graphContainer = container.querySelector('.graph-container');
 
     if (window.currentAnimation) {
         clearTimeout(window.currentAnimation);
