@@ -7,6 +7,7 @@ import {
 } from "../output/messages.js";
 import {
     checkMatrixCompletion,
+    createContentWrapper,
     displayGraph,
     lockMatrixInputs,
     renderMatrix,
@@ -222,14 +223,16 @@ export const Router = {
         }
 
         const row = document.createElement('div');
+        row.id = 'level-row-' + this.currentLevel;
         row.className = 'level-row';
         row.dataset.level = this.currentLevel;
         row.innerHTML = rowTemplate;
 
         const textContainer = row.querySelector('.result-text-container');
         textContainer.textContent = this.currentInfo;
-
         container.appendChild(row);
+        let resultRow = row.querySelector('.result-row');
+        createContentWrapper(resultRow);
     },
 
     prepareLevel() {
@@ -286,10 +289,7 @@ export const Router = {
                         this.nextLevelApply(row);
                     } else {
                         this.addToStorage();
-                        renderMatrix(
-                            this.answerGraph,
-                            row.querySelector('.result-matrix-container'),
-                            true);
+                        renderMatrix(this.answerGraph, row, true);
                     }
                     return;
                 }
@@ -340,8 +340,7 @@ export const Router = {
                 if (isCorrect) {
                     showCompletionMessage();
                     this.cleanElements();
-                    lockMatrixInputs(
-                        row.querySelector('.result-matrix-container'));
+                    lockMatrixInputs(row.querySelector('.matrix-container'));
                     this.currentLevel++;
                     if (this.currentLevel - 1 < this.maxLevel) {
                         this.nextLevelApply(row);
@@ -421,6 +420,7 @@ export const Router = {
 
             const row = document.createElement('div');
             row.className = 'level-row';
+            row.id = 'level-row-' + currentLevel;
             row.dataset.level = currentLevel;
 
             row.innerHTML = resultRowTemplate;
@@ -428,11 +428,9 @@ export const Router = {
             const textContainer = row.querySelector('.result-text-container');
             textContainer.textContent =
                 this.getLevelInfo(currentLevel, multiplyType);
-
-            renderMatrix(storedGraph,
-                         row.querySelector('.result-matrix-container'), true);
-            displayGraph(storedGraph,
-                         row.querySelector('.result-graph-container'));
+            createContentWrapper(row.querySelector('.result-row'));
+            renderMatrix(storedGraph, row, true);
+            displayGraph(storedGraph, row);
 
             levelsContainer.appendChild(row);
         });

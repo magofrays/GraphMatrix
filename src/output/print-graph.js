@@ -1,6 +1,22 @@
 import {showCompletionMessage} from "./messages.js";
 
-function createGraphFromMatrix(graph, answerGraph = null, isStart = false) {
+export function createContentWrapper(container) {
+    if (!container)
+        return;
+    let contentWrapper =
+        container.querySelector(".content-wrapper"); // удаляем wrapper
+    if (contentWrapper) {
+        contentWrapper.remove()
+    } // создаем новый
+    container.insertAdjacentHTML('beforeend', `
+                        <div class="content-wrapper" id="content-wrapper">
+                            <div class="matrix-container"></div>
+                            <div class="graph-container"></div>
+                        </div>
+                    `);
+}
+
+function createGraphFromMatrix(graph, answerGraph = null) {
     const nodes = new vis.DataSet([]);
     const edges = new vis.DataSet([]);
 
@@ -14,10 +30,7 @@ function createGraphFromMatrix(graph, answerGraph = null, isStart = false) {
 
     const graphType = graph.GenType;
     let border = matrix.length;
-    let addColor = "white";
-    if (isStart) {
-        addColor = "#f9f9f9";
-    }
+    let addColor = "#effde7";
     for (let i = 0; i < matrix.length; i++) {
         edges.add({
             from : i,
@@ -74,15 +87,10 @@ function createGraphFromMatrix(graph, answerGraph = null, isStart = false) {
     return {nodes, edges};
 }
 
-export function renderMatrix(graph, containerId, isTrue = false) {
-    let container = containerId;
-    if (containerId instanceof HTMLElement) {
-        container = containerId;
-    } else {
-        container = document.getElementById(containerId);
-    }
+export function renderMatrix(graph, container, isTrue = false) {
     if (!container)
         return;
+    let matrixContainer = container.querySelector(".matrix-container");
 
     const table = document.createElement("table");
     table.className = "graph-matrix";
@@ -112,13 +120,14 @@ export function renderMatrix(graph, containerId, isTrue = false) {
         }
         table.appendChild(row);
     }
-    container.innerHTML = "";
-    container.appendChild(table);
+    matrixContainer.innerHTML = "";
+    matrixContainer.appendChild(table);
 }
 
-export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
-    const matrixContainer = row.querySelector('.result-matrix-container');
-    const graphContainer = row.querySelector('.result-graph-container');
+export function renderMatrixTraining(graph, container, answerGraph,
+                                     onComplete) {
+    const matrixContainer = container.querySelector('.matrix-container');
+    // const graphContainer = container.querySelector('.graph-container');
 
     matrixContainer.innerHTML = '';
     const table = document.createElement("table");
@@ -189,7 +198,7 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
                         onComplete();
                 }
 
-                displayGraph(graph, graphContainer, answerGraph);
+                displayGraph(graph, container, answerGraph);
             });
 
             td.appendChild(input);
@@ -199,7 +208,7 @@ export function renderMatrixTraining(graph, row, answerGraph, onComplete) {
         table.appendChild(row);
     }
 
-    displayGraph(graph, graphContainer, answerGraph);
+    displayGraph(graph, container, answerGraph);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
 
@@ -220,9 +229,9 @@ export function clearResults() {
         newGraphContainer.innerHTML = '';
 }
 
-export function renderMatrixCheck(graph, row, answerGraph = null) {
-    const matrixContainer = row.querySelector('.result-matrix-container');
-    const graphContainer = row.querySelector('.result-graph-container');
+export function renderMatrixCheck(graph, container, answerGraph = null) {
+    const matrixContainer = container.querySelector('.matrix-container');
+    // const graphContainer = container.querySelector('.graph-container');
 
     const table = document.createElement("table");
     table.className = "graph-matrix";
@@ -271,7 +280,7 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
                 const value = parseInt(e.target.value) || -1;
                 graph.changeEdge(row, col, value);
 
-                displayGraph(graph, graphContainer);
+                displayGraph(graph, container);
             });
 
             td.appendChild(input);
@@ -281,14 +290,15 @@ export function renderMatrixCheck(graph, row, answerGraph = null) {
         table.appendChild(row);
     }
 
-    displayGraph(graph, graphContainer);
+    displayGraph(graph, container);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
 }
 
-export function renderMatrixDemonstration(graph, row, answerGraph = null) {
-    const matrixContainer = row.querySelector('.result-matrix-container');
-    const graphContainer = row.querySelector('.result-graph-container');
+export function renderMatrixDemonstration(graph, container,
+                                          answerGraph = null) {
+    const matrixContainer = container.querySelector('.matrix-container');
+    // const graphContainer = container.querySelector('.graph-container');
 
     if (window.currentAnimation) {
         clearTimeout(window.currentAnimation);
@@ -328,7 +338,7 @@ export function renderMatrixDemonstration(graph, row, answerGraph = null) {
     }
     matrixContainer.appendChild(table);
 
-    const speedControl = row.querySelector('.speed-control');
+    const speedControl = container.querySelector('.speed-control');
     let speed = 3500 - parseInt(speedControl.value);
     speedControl.addEventListener(
         'input', () => { speed = 3500 - parseInt(speedControl.value); });
@@ -352,7 +362,7 @@ export function renderMatrixDemonstration(graph, row, answerGraph = null) {
         const newValue = answerMatrix[i][j];
         graph.changeEdge(i, j, newValue);
         table.rows[i + 1].cells[j + 1].textContent = newValue;
-        displayGraph(graph, graphContainer, answerGraph);
+        displayGraph(graph, container, answerGraph);
 
         currentStep++;
         window.currentAnimation = setTimeout(animateStep, speed);
@@ -372,18 +382,15 @@ export function checkMatrixCompletion(userMatrix, correctMatrix) {
     return true;
 }
 
-export function displayGraph(graph, containerId, answerGraph = null,
-                             isStart = false) {
-    const graphData = createGraphFromMatrix(graph, answerGraph, isStart);
-    let container = containerId;
-    if (containerId instanceof HTMLElement) {
-        container = containerId;
-    } else {
-        container = document.getElementById(containerId);
+export function displayGraph(graph, container, answerGraph = null) {
+    if (!container) {
+        return;
     }
+    let graphContainer = container.querySelector(".graph-container");
+    const graphData = createGraphFromMatrix(graph, answerGraph);
 
-    container.style.width = '450px';
-    container.style.height = '450px';
+    graphContainer.style.width = '450px';
+    graphContainer.style.height = '450px';
 
     const data = {nodes : graphData.nodes, edges : graphData.edges};
 
@@ -409,10 +416,7 @@ export function displayGraph(graph, containerId, answerGraph = null,
             scaling : {min : 30, max : 30, label : {enabled : false}}
         },
         edges : {
-            selfReference : {
-                size : 20,
-                angle : Math.PI / 4
-            },
+            selfReference : {size : 20, angle : Math.PI / 4},
             color : {color : '#6a9f6a', opacity : 1.0, highlight : '#6a9f6a'},
             width : 3,
             smooth : {type : 'continuous', roundness : 0.5},
@@ -451,7 +455,7 @@ export function displayGraph(graph, containerId, answerGraph = null,
         node.y = center.y + radius * Math.sin(angle);
     });
 
-    const network = new vis.Network(container, data, options);
+    const network = new vis.Network(graphContainer, data, options);
 
     network.once('stabilizationIterationsDone', function() {
         network.setOptions({
