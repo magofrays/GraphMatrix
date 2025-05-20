@@ -318,7 +318,7 @@ export const Router = {
     },
 
     updateInfo() {
-        if (!this.isApplied) {
+        if (this.storedLevels.length === 0) {
             this.multiplyType = document.getElementById('multiply-type').value;
             this.power = document.getElementById('power').value;
             this.currentInfo = this.getLevelInfo(this.power);

@@ -3,11 +3,10 @@ import {showCompletionMessage} from "./messages.js";
 export function createContentWrapper(container) {
     if (!container)
         return;
-    let contentWrapper =
-        container.querySelector(".content-wrapper");
+    let contentWrapper = container.querySelector(".content-wrapper");
     if (contentWrapper) {
         contentWrapper.remove()
-    } 
+    }
     container.insertAdjacentHTML('beforeend', `
                         <div class="content-wrapper" id="content-wrapper">
                             <div class="matrix-container"></div>
@@ -91,7 +90,6 @@ export function renderMatrix(graph, container, isTrue = false) {
     if (!container)
         return;
     let matrixContainer = container.querySelector(".matrix-container");
-
     const table = document.createElement("table");
     table.className = "graph-matrix";
 
@@ -126,17 +124,15 @@ export function renderMatrix(graph, container, isTrue = false) {
 
 export function renderMatrixTraining(graph, container, answerGraph,
                                      onComplete) {
+    if (!container)
+        return;
     const matrixContainer = container.querySelector('.matrix-container');
-
     matrixContainer.innerHTML = '';
     const table = document.createElement("table");
     table.className = "graph-matrix";
-
     const matrix = graph.Matrix;
-
     const headerRow = document.createElement("tr");
     headerRow.appendChild(document.createElement("th"));
-
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
         th.textContent = j;
@@ -181,16 +177,17 @@ export function renderMatrixTraining(graph, container, answerGraph,
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
 
-                let value = e.target.value === '' ? -1 : parseInt(e.target.value);
-                if (isNaN(value)) value = -1;
+                let value =
+                    e.target.value === '' ? -1 : parseInt(e.target.value);
+                if (isNaN(value))
+                    value = -1;
 
                 graph.changeEdge(row, col, value);
 
                 const correctValue = answerGraph.Matrix[row][col];
-                if (value == -1){
+                if (value == -1) {
                     e.target.style.backgroundColor = "#f9f9f9";
-                }
-                else if (value === correctValue) {
+                } else if (value === correctValue) {
                     e.target.style.backgroundColor = "#e3f8d8";
                 } else {
                     e.target.style.backgroundColor = "#ffaaaa";
@@ -235,6 +232,8 @@ export function clearResults() {
 }
 
 export function renderMatrixCheck(graph, container, answerGraph = null) {
+    if (!container)
+        return;
     const matrixContainer = container.querySelector('.matrix-container');
 
     const table = document.createElement("table");
@@ -282,8 +281,10 @@ export function renderMatrixCheck(graph, container, answerGraph = null) {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
 
-                let value = e.target.value === '' ? -1 : parseInt(e.target.value);
-                if (isNaN(value)) value = -1;
+                let value =
+                    e.target.value === '' ? -1 : parseInt(e.target.value);
+                if (isNaN(value))
+                    value = -1;
 
                 graph.changeEdge(row, col, value);
 
@@ -304,6 +305,8 @@ export function renderMatrixCheck(graph, container, answerGraph = null) {
 
 export function renderMatrixDemonstration(graph, container,
                                           answerGraph = null) {
+    if (!container)
+        return;
     const matrixContainer = container.querySelector('.matrix-container');
 
     if (window.currentAnimation) {
