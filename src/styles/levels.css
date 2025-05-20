@@ -1,7 +1,6 @@
 .level-row {
     margin-bottom: 40px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #3f8534;
 }
 
 .level-row:last-child {
@@ -9,7 +8,6 @@
 }
 
 #levels-container {
-    padding: 20px;
     margin-top: 20px;
     height: 100%;
 }
@@ -23,14 +21,18 @@
   display: flex;
   gap: 5px;
   align-items: flex-start;
-  width: 100%;
+  justify-content: space-between;
+  border-radius: 5px;
+  background: #f9f9f9;
+  padding: 15px;
+  border: 2px solid #ddd;
 }
 
 .result-info {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  flex: 0 0 450px; 
+  flex: 0 0 400px; 
   min-width: 200px;
 }
 

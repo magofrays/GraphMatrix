@@ -22,9 +22,7 @@ import {
     resultRowWithControlsTemplate
 } from "./result-templates.js";
 import {
-    checkTemplate,
-    demonstrationTemplate,
-    trainingTemplate
+    appTemplate,
 } from "./templates.js";
 
 export const Router = {
@@ -32,6 +30,7 @@ export const Router = {
     newGraph : null,
     answerGraph : null,
     animationId : null,
+    currentRoute : null,
     currentInfo : "",
     currentLevel : 1,
     maxLevel : 5,
@@ -41,20 +40,20 @@ export const Router = {
 
     routes : {
         '#demonstration' : {
-            template : demonstrationTemplate,
             mode : 'demonstration',
+            info : 'Режим демонстрации',
             rowTemplate : resultRowWithControlsTemplate,
             initLevel() { Router.initDemonstrationLevel();}
         },
         '#training' : {
-            template : trainingTemplate,
             mode : 'training',
+            info : 'Режим тренажера',
             rowTemplate : resultRowTemplate,
             initLevel() { Router.initTrainingLevel();}
         },
         '#check' : {
-            template : checkTemplate,
             mode : 'check',
+            info : 'Режим проверки',
             rowTemplate : resultRowWithCheckTemplate,
             initLevel() { Router.initCheckLevel();}
         }
@@ -71,7 +70,9 @@ export const Router = {
         const route = this.routes[hash];
         this.cleanupPreviousMode();
         this.currentRoute = route;
-        document.getElementById('app').innerHTML = route.template;
+        document.getElementById('app').innerHTML = appTemplate;
+        console.log(route.info);
+        document.querySelector('.route-name').innerHTML = route.info;
         const multiplyTypeSelect = document.getElementById('multiply-type');
         multiplyTypeSelect.value = this.multiplyType;
         this.initializeMode();

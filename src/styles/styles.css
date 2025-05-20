@@ -30,7 +30,6 @@ body {
 
 .global-info {
   padding: 15px;
-  /* margin: 20px 20px; */
   border: 1px solid #ddd;
   border-radius: 5px;
   background: #f9f9f9;
@@ -75,13 +74,13 @@ body {
 
 .controls-container {
   display: flex;
-  gap: 5px;
   align-items: flex-start;
+  justify-content: space-between;
   width: 100%;
 }
 
 .controls {
-  flex: 0 0 450px;
+  flex: 0 0 400px;
 }
 
 #matrix-container {
@@ -147,15 +146,15 @@ body {
 }
 
 .content-wrapper {
-  flex: 1;
+  flex: 0.8;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
   border: 3px solid #cbfbb1; 
   border-radius: 5px; 
-  padding: 20px;
+  padding: 5px;
   box-sizing: border-box; 
-  gap: 10px;
+  gap: 0px;
   background-color: #effde7;
   box-sizing: border-box;
 }
