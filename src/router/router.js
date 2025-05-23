@@ -132,8 +132,6 @@ export const Router = {
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
-                alert(this.currentLevel);
-                alert(this.currentMode);
                 if (this.currentMode === '#check'){
                     if (this.isNext){
                         this.isNext = false;
