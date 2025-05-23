@@ -27,15 +27,14 @@ import {
 
 export const Router = {
     currentRoute : null,
+    currentMode: 'check',
     newGraph : null,
     answerGraph : null,
-    animationId : null,
-    currentRoute : null,
-    currentInfo : "",
+    currentInfo : '',
     currentLevel : 1,
     maxLevel : 5,
     storedLevels : [],
-    multiplyType : "classic",
+    multiplyType : 'classic',
 
     routes : {
         '#demonstration' : {
@@ -70,8 +69,8 @@ export const Router = {
     },
 
     loadRoute() {
-        const hash = window.location.hash || '#demonstration';
-        const route = this.routes[hash];
+        this.currentMode = window.location.hash || '#demonstration';
+        const route = this.routes[this.currentMode];
         this.cleanupPreviousMode();
         this.currentRoute = route;
         document.getElementById('app').innerHTML = appTemplate;
@@ -133,6 +132,15 @@ export const Router = {
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
+                alert(this.currentLevel);
+                alert(this.currentMode);
+                if (this.currentMode === '#check'){
+                    if (this.isNext){
+                        this.isNext = false;
+                        this.currentLevel -= 1;
+                    }
+                    this.createTestMatrices();
+                }
                 this.showCurrentMode();
             }
             this.outputStorage();
