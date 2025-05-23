@@ -1,6 +1,5 @@
 import {showErrorSelectMessage} from '../output/messages.js';
 import {
-    clearResults,
     createContentWrapper,
     displayGraph,
     renderMatrix
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (SelectManager.getVertexCount() == -1) {
             showErrorSelectMessage();
         } else {
-            Router.loadRoute();
+            Router.restart(); // какая-то херня
 
             const countVertex = SelectManager.getVertexCount();
             const countEdges = SelectManager.getEdgeCount();

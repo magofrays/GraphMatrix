@@ -36,7 +36,6 @@ export const Router = {
     maxLevel : 5,
     storedLevels : [],
     multiplyType : "classic",
-    isApplied : false,
 
     routes : {
         '#demonstration' : {
@@ -63,15 +62,19 @@ export const Router = {
         window.addEventListener('hashchange', () => this.loadRoute());
         this.loadRoute();
     },
+    restart() {
+        this.cleanupPreviousMode(true);
+        this.answerGraph = null;
+        this.newGraph = null;
+        this.loadRoute();
+    },
 
     loadRoute() {
-        this.isApplied = false;
         const hash = window.location.hash || '#demonstration';
         const route = this.routes[hash];
         this.cleanupPreviousMode();
         this.currentRoute = route;
         document.getElementById('app').innerHTML = appTemplate;
-        console.log(route.info);
         document.querySelector('.route-name').innerHTML = route.info;
         const multiplyTypeSelect = document.getElementById('multiply-type');
         multiplyTypeSelect.value = this.multiplyType;
@@ -92,7 +95,6 @@ export const Router = {
             this.currentLevel = parseInt(this.power);
             this.createTestMatrices();
             this.showCurrentMode();
-            this.isApplied = true;
         });
     },
 
@@ -113,6 +115,7 @@ export const Router = {
             this.storedLevels = [];
             this.isNext = false;
         }
+
         if (window.currentAnimation) {
             clearTimeout(window.currentAnimation);
         }
@@ -223,6 +226,16 @@ export const Router = {
         }
     },
 
+    onComplete(row) {
+        if (!this.isNext)
+            this.currentLevel++;
+        if (this.currentLevel - 1 < this.maxLevel) {
+            this.createNextLevelButton(row);
+        } else {
+            this.addToStorage();
+        }
+    },
+
     initTrainingLevel() {
         const row = document.querySelector(
             `.level-row[data-level="${this.currentLevel}"]`);
@@ -256,20 +269,12 @@ export const Router = {
             this.handleCheckClick = () => {
                 document.querySelectorAll('.completion-message, .fail-message')
                     .forEach(el => el.remove());
-
-                const isCorrect = checkMatrixCompletion(
-                    this.newGraph.Matrix, this.answerGraph.Matrix);
-
-                if (isCorrect) {
+                if (checkMatrixCompletion(this.newGraph.Matrix,
+                                          this.answerGraph.Matrix)) {
                     showCompletionMessage();
                     this.cleanElements();
                     lockMatrixInputs(row.querySelector('.matrix-container'));
-                    this.currentLevel++;
-                    if (this.currentLevel - 1 < this.maxLevel) {
-                        this.createNextLevelButton(row);
-                    } else {
-                        this.addToStorage();
-                    }
+                    this.onComplete(row);
                 } else {
                     showFailMessage();
                 }
@@ -324,7 +329,6 @@ export const Router = {
             this.currentInfo = this.getLevelInfo(this.power);
         } else {
             const level = this.storedLevels[this.storedLevels.length - 1];
-            console.log(level);
             this.multiplyType = level.multiplyType;
             this.power = level.currentLevel + 1;
             this.currentInfo = this.getLevelInfo(this.power);

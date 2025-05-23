@@ -196,8 +196,7 @@ export function renderMatrixTraining(graph, container, answerGraph,
                 if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
                     showCompletionMessage();
                     lockMatrixInputs(matrixContainer);
-                    if (onComplete)
-                        onComplete();
+                    onComplete();
                 }
 
                 displayGraph(graph, container, answerGraph);
@@ -216,51 +215,32 @@ export function renderMatrixTraining(graph, container, answerGraph,
 
     if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
         lockMatrixInputs(matrixContainer);
-        if (onComplete)
-            onComplete();
+        onComplete(container);
     }
 }
 
-export function clearResults() {
-    const newMatrixContainer = document.getElementById('new-matrix-container');
-    const newGraphContainer = document.getElementById('new-graph-container');
-
-    if (newMatrixContainer)
-        newMatrixContainer.innerHTML = '';
-    if (newGraphContainer)
-        newGraphContainer.innerHTML = '';
-}
-
-export function renderMatrixCheck(graph, container, answerGraph = null) {
+export function renderMatrixCheck(graph, container) {
     if (!container)
         return;
     const matrixContainer = container.querySelector('.matrix-container');
-
     const table = document.createElement("table");
     table.className = "graph-matrix";
-
     const matrix = graph.Matrix;
-
     const headerRow = document.createElement("tr");
     headerRow.appendChild(document.createElement("th"));
-
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
         th.textContent = j;
         headerRow.appendChild(th);
     }
     table.appendChild(headerRow);
-
     for (let i = 0; i < matrix.length; i++) {
         const row = document.createElement("tr");
-
         const th = document.createElement("th");
         th.textContent = i;
         row.appendChild(th);
-
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
-
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 4;
@@ -280,14 +260,11 @@ export function renderMatrixCheck(graph, container, answerGraph = null) {
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-
                 let value =
                     e.target.value === '' ? -1 : parseInt(e.target.value);
                 if (isNaN(value))
                     value = -1;
-
                 graph.changeEdge(row, col, value);
-
                 displayGraph(graph, container);
             });
 
@@ -358,21 +335,12 @@ export function renderMatrixDemonstration(graph, container,
     const animateStep = () => {
         if (currentStep >= totalSteps)
             return;
-
         const i = Math.floor(currentStep / matrix.length);
         const j = currentStep % matrix.length;
-
-        if (matrix[i][j] == answerMatrix[i][j]) {
-            currentStep++;
-            window.currentAnimation = setTimeout(animateStep, 0);
-            return;
-        }
-
         const newValue = answerMatrix[i][j];
         graph.changeEdge(i, j, newValue);
         table.rows[i + 1].cells[j + 1].textContent = newValue;
         displayGraph(graph, container, answerGraph);
-
         currentStep++;
         window.currentAnimation = setTimeout(animateStep, speed);
     };

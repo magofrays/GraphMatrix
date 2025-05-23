@@ -317,14 +317,14 @@ function tropicalMatrixMultiply(first, second) {
     for (let i = 0; i < rows1; i++) {
         for (let j = 0; j < cols2; j++) {
             for (let k = 0; k < cols1; k++) {
-                const firstVal = first[i][k] === 0 ? Infinity : first[i][k];
-                const secondVal = second[k][j] === 0 ? Infinity : second[k][j];
+                const firstVal = first[i][k] === 0 ? -Infinity : first[i][k];
+                const secondVal = second[k][j] === 0 ? -Infinity : second[k][j];
 
                 newMatrix[i][j] =
-                    Math.min(newMatrix[i][j], firstVal + secondVal);
+                    Math.max(newMatrix[i][j], firstVal + secondVal);
             }
             newMatrix[i][j] =
-                newMatrix[i][j] === Infinity ? 0 : newMatrix[i][j];
+                newMatrix[i][j] === -Infinity ? 0 : newMatrix[i][j];
         }
     }
     return newMatrix;
