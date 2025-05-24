@@ -25,6 +25,7 @@ import {
     appTemplate,
 } from "./templates.js";
 
+<<<<<<< HEAD
 export class Router {
     currentRoute = null;
     newGraph = null;
@@ -36,6 +37,18 @@ export class Router {
     maxLevel = 5;
     storedLevels = [];
     multiplyType = "classic";
+=======
+export const Router = {
+    currentRoute : null,
+    currentMode: 'check',
+    newGraph : null,
+    answerGraph : null,
+    currentInfo : '',
+    currentLevel : 1,
+    maxLevel : 5,
+    storedLevels : [],
+    multiplyType : 'classic',
+>>>>>>> main
 
     routes = {
         '#demonstration' : {
@@ -71,8 +84,8 @@ export class Router {
     };
 
     loadRoute() {
-        const hash = window.location.hash || '#demonstration';
-        const route = this.routes[hash];
+        this.currentMode = window.location.hash || '#demonstration';
+        const route = this.routes[this.currentMode];
         this.cleanupPreviousMode();
         this.currentRoute = route;
         document.getElementById('app').innerHTML = appTemplate;
@@ -138,6 +151,13 @@ export class Router {
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
+                if (this.currentMode === '#check'){
+                    if (this.isNext){
+                        this.isNext = false;
+                        this.currentLevel -= 1;
+                    }
+                    this.createTestMatrices();
+                }
                 this.showCurrentMode();
             }
             this.outputStorage();

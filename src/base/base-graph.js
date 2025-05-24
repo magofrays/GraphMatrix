@@ -312,7 +312,7 @@ function tropicalMatrixMultiply(first, second) {
             "Number of columns in first matrix must equal number of rows in second matrix");
     }
     let newMatrix =
-        new Array(rows1).fill().map(() => new Array(cols2).fill(Infinity));
+        new Array(rows1).fill().map(() => new Array(cols2).fill(-Infinity));
 
     for (let i = 0; i < rows1; i++) {
         for (let j = 0; j < cols2; j++) {
