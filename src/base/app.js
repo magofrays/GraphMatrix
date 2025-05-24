@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (SelectManager.getVertexCount() == -1) {
             showErrorSelectMessage();
         } else {
-            Router.restart(); // какая-то херня
+            Router.restart();
 
             const countVertex = SelectManager.getVertexCount();
             const countEdges = SelectManager.getEdgeCount();
