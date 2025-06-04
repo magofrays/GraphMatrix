@@ -25,7 +25,6 @@ import {
     appTemplate,
 } from "./templates.js";
 
-<<<<<<< HEAD
 export class Router {
     currentRoute = null;
     newGraph = null;
@@ -37,18 +36,6 @@ export class Router {
     maxLevel = 5;
     storedLevels = [];
     multiplyType = "classic";
-=======
-export const Router = {
-    currentRoute : null,
-    currentMode: 'check',
-    newGraph : null,
-    answerGraph : null,
-    currentInfo : '',
-    currentLevel : 1,
-    maxLevel : 5,
-    storedLevels : [],
-    multiplyType : 'classic',
->>>>>>> main
 
     routes = {
         '#demonstration' : {
@@ -151,8 +138,8 @@ export const Router = {
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
-                if (this.currentMode === '#check'){
-                    if (this.isNext){
+                if (this.currentMode === '#check') {
+                    if (this.isNext) {
                         this.isNext = false;
                         this.currentLevel -= 1;
                     }
