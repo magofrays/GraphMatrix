@@ -1,5 +1,15 @@
+/**
+ * Класс, управляющий выпадающими списками выбора параметров графа.
+ *
+ * @class SelectManager
+ * @property {TomSelect} graphType - Выбор типа графа (например, SYMM, ASYMM).
+ * @property {TomSelect} vertexCount - Выбор количества вершин графа.
+ * @property {TomSelect} edgeCount - Выбор количества рёбер графа.
+ */
 export class SelectManager {
-
+    /**
+     * Инициализирует выпадающие списки и настраивает обработчики событий.
+     */
     constructor() {
         this.graphType = new TomSelect('#graph-type', {
             create : false,
@@ -27,6 +37,9 @@ export class SelectManager {
         this.setupEvents();
     }
 
+    /**
+     * Настраивает обработчики событий изменения значений в полях выбора.
+     */
     setupEvents() {
         document.getElementById('vertex-count')
             .addEventListener('change', () => this.updateEdgeCount());
@@ -34,6 +47,13 @@ export class SelectManager {
             .addEventListener('change', () => this.updateEdgeCount());
     }
 
+    /**
+     * Возвращает максимальное возможное количество рёбер в зависимости от типа
+     * графа.
+     *
+     * @param {number} selectedValue - Количество вершин графа.
+     * @returns {number} Максимальное количество рёбер.
+     */
     getMaxValue(selectedValue) {
         const currentType = this.graphType.getValue();
         if (currentType === "SYMM" || currentType == "ANTISYMM") {
@@ -46,6 +66,10 @@ export class SelectManager {
         }
     }
 
+    /**
+     * Обновляет доступные значения для количества рёбер на основе количества
+     * вершин и типа графа.
+     */
     updateEdgeCount() {
         const vertexCount = this.getVertexCount();
         const min = vertexCount - 1;
@@ -89,16 +113,45 @@ export class SelectManager {
         }, 50);
     }
 
+    /**
+     * Возвращает текущий тип графа из выпадающего списка.
+     *
+     * @returns {string} Тип графа (например, 'SYMM', 'ASYMM').
+     */
     getGraphType() { return document.getElementById('graph-type').value; }
 
+    /**
+     * Возвращает количество вершин, выбранное пользователем.
+     *
+     * @returns {number} Количество вершин. Возвращает -1, если значение не
+     *     задано или некорректно.
+     */
     getVertexCount() {
         return parseInt(document.getElementById('vertex-count').value);
     }
 
+    /**
+     * Возвращает минимально допустимое количество рёбер (обычно vertexCount -
+     * 1).
+     *
+     * @returns {number} Минимальное количество рёбер.
+     */
     getMinEdges() { return this.getVertexCount() - 1; }
 
+    /**
+     * Возвращает максимально допустимое количество рёбер в зависимости от типа
+     * графа.
+     *
+     * @returns {number} Максимальное количество рёбер.
+     */
     getMaxEdges() { return this.getMaxValue(this.getVertexCount()); }
 
+    /**
+     * Возвращает количество рёбер, выбранное пользователем.
+     *
+     * @returns {number} Количество рёбер. Возвращает -1, если значение
+     *     некорректно.
+     */
     getEdgeCount() {
         const value = this.edgeCount.getValue();
         if (!value)
@@ -111,9 +164,5 @@ export class SelectManager {
             return -1;
         }
         return numValue;
-    }
-
-    getVertexCount() {
-        return parseInt(document.getElementById('vertex-count').value);
     }
 };
