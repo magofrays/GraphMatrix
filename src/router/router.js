@@ -256,7 +256,7 @@ export class Router {
             this.answerGraph.tropicalMultiply(this.currentLevel);
             break;
         }
-        this.newGraph = new Graph();
+        this.newGraph = new Graph;
         this.newGraph.clone(AppState.graph);
         for (let i = 0; i < AppState.graph.size; i++) {
             for (let j = 0; j < AppState.graph.size; j++) {

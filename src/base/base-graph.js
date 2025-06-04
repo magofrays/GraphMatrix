@@ -53,8 +53,13 @@ class Graph {
      * @param {GraphGenerationType} [genType=GraphGenerationType.DEFAULT] - Тип
      *     генерации графа.
      */
-    constructor(size = 0, edgeNumber = 0,
-                genType = GraphGenerationType.DEFAULT) {
+    constructor(size, edgeNumber, genType = GraphGenerationType.DEFAULT) {
+        if (size == undefined) {
+            this.size = 0;
+            this.matrix = [];
+            this.genType = GraphGenerationType.DEFAULT;
+            return;
+        }
         this.size = size;
         this.edgeNumber = edgeNumber;
         this.genType = genType;
