@@ -14,7 +14,7 @@ const GraphGenerationType = Object.freeze({
  * @class Graph
  *
  * @property {string} genType - Тип генерации графа. Возможные значения:
- * 'DEFAULT', 'SPARSE', 'DENSE'.
+ * 'DEFAULT', 'SYMM', 'ASYMM', 'ANTISYMM'.
  * @property {number} size - Количество вершин в графе.
  * @property {number} edgeNumber - Количество рёбер в графе.
  * @property {number} sumWeights - Сумма весов всех рёбер графа.
@@ -22,18 +22,6 @@ const GraphGenerationType = Object.freeze({
  * графа.
  * @property {number[][]} matrix - Матрица смежности графа. matrix[i][j] — вес
  * ребра между вершинами i и j.
- *
- * @example
- * const graph = new Graph();
- * graph.size = 5;
- * graph.edgeNumber = 7;
- * graph.matrix = [
- *   [0, 2, 0, 0, 3],
- *   [2, 0, 1, 0, 0],
- *   [0, 1, 0, 4, 0],
- *   [0, 0, 4, 0, 5],
- *   [3, 0, 0, 5, 0]
- * ];
  */
 class Graph {
     genType = 'DEFAULT';
@@ -101,12 +89,6 @@ class Graph {
      * @param {Graph} oldGraph - Экземпляр графа, данные которого будут
      *     скопированы.
      * @returns {void}
-     *
-     * @example
-     * const graph1 = new Graph();
-     * // ...заполнение graph1
-     * const graph2 = new Graph();
-     * graph2.clone(graph1); // Теперь graph2 содержит копию данных graph1
      */
     clone(oldGraph) {
         this.genType = oldGraph.genType;
@@ -122,11 +104,6 @@ class Graph {
      * ширину (BFS).
      *
      * @returns {number} Количество компонент связности.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * const components = graph.findConnectedComponents(); // Например: 2
      */
     findConnectedComponents() {
         if (this.size === 0) {
@@ -157,12 +134,6 @@ class Graph {
      * (`this.edgeNumber`).
      *
      * @returns {void}
-     *
-     * @example
-     * const graph = new Graph();
-     * graph.size = 5;
-     * graph.edgeNumber = 7;
-     * graph.generateDefault(); // Теперь матрица содержит 7 случайных рёбер
      */
     generateDefault() {
         let edgesAdded = 0;
@@ -187,14 +158,6 @@ class Graph {
      * будет достигнуто нужное количество рёбер.
      *
      * @returns {void}
-     *
-     * @example
-     * const graph = new Graph();
-     * graph.size = 5;
-     * graph.edgeNumber = 7;
-     * graph.genType = GraphGenerationType.SYMMETRICAL;
-     * graph.generateSymmetrical(); // Теперь матрица содержит 7 симметричных
-     * рёбер
      */
     generateSymmetrical() {
         let edgesAdded = 0;
@@ -211,22 +174,14 @@ class Graph {
     }
 
     /**
-     * Генерирует антисимметричный граф, где наличие ребра i→j исключает наличие
-     * ребра j→i.
+     * Генерирует антисимметричный граф, где наличие ребра i-j исключает наличие
+     * ребра j-i.
      *
      * Метод случайным образом добавляет рёбра в матрицу смежности так, чтобы
-     * соблюдалось свойство антисимметричности: если есть ребро i→j, то ребра
-     * j→i быть не должно.
+     * соблюдалось свойство антисимметричности: если есть ребро i-j, то ребра
+     * j-i быть не должно.
      *
      * @returns {void}
-     *
-     * @example
-     * const graph = new Graph();
-     * graph.size = 5;
-     * graph.edgeNumber = 7;
-     * graph.genType = GraphGenerationType.ANTISYMMETRICAL;
-     * graph.generateAntisymmetrical(); // Теперь матрица содержит 7
-     * антисимметричных рёбер
      */
     generateAntisymmetrical() {
         let edgesAdded = 0;
@@ -246,17 +201,9 @@ class Graph {
      *
      * Метод случайным образом добавляет рёбра в матрицу смежности так, чтобы:
      * - не было петель (i !== j),
-     * - не существовало обратного ребра (если i→j, то j→i быть не должно).
+     * - не существовало обратного ребра (если i-j, то j-i быть не должно).
      *
      * @returns {void}
-     *
-     * @example
-     * const graph = new Graph();
-     * graph.size = 5;
-     * graph.edgeNumber = 7;
-     * graph.genType = GraphGenerationType.ASYMMETRICAL;
-     * graph.generateAsymmetrical(); // Теперь матрица содержит 7 асимметричных
-     * рёбер
      */
     generateAsymmetrical() {
         let edgesAdded = 0;
@@ -279,11 +226,6 @@ class Graph {
      *
      * @param {number} idx - Индекс вершины, для которой ищутся соседи.
      * @returns {number[]} Массив индексов соседних вершин.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * const neighbors = graph.neighbors(2); // Например: [0, 3]
      */
     neighbors(idx) {
         let result = [];
@@ -296,7 +238,6 @@ class Graph {
     }
     /**
      * Подсчитывает количество рёбер в ориентированном графе.
-     *
      *
      * @returns {number} Количество уникальных рёбер.
      */
@@ -320,11 +261,6 @@ class Graph {
      * неориентированном графе каждое ребро будет учтено дважды.
      *
      * @returns {number} Сумма весов всех рёбер графа.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * const totalWeight = graph.countWeights(); // Например: 25
      */
     countWeights() {
         let sumWeights = 0;
@@ -353,12 +289,6 @@ class Graph {
      * @returns {void}
      *
      * @throws {Error} Если степень меньше 1.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * graph.classicMultiply(3); // Теперь матрица — результат трёхкратного
-     * умножения самой на себя
      */
     classicMultiply(power) {
         if (power < 1) {
@@ -394,12 +324,6 @@ class Graph {
      * @returns {void}
      *
      * @throws {Error} Если степень меньше 1.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * graph.logicalMultiply(2); // Теперь матрица содержит информацию о
-     * достижимости за 2 шага
      */
     logicalMultiply(power) {
         if (power < 1) {
@@ -435,12 +359,6 @@ class Graph {
      * @returns {void}
      *
      * @throws {Error} Если степень меньше 1.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа с весами
-     * graph.tropicalMultiply(2); // Теперь матрица содержит длины кратчайших
-     * //путей за 2 шага
      */
     tropicalMultiply(power) {
         if (power < 1) {
@@ -462,18 +380,11 @@ class Graph {
      *
      * Проверяет, является ли граф:
      * - симметричным (если matrix[i][j] === matrix[j][i]),
-     * - антисимметричным (если matrix[i][j] === 1 && matrix[j][i] === 0 для i ≠
-     * j),
+     * - антисимметричным (если matrix[i][j] === 1 && matrix[j][i] === 0 для i !== j),
      * - асимметричным (отсутствие петель и только односторонние рёбра).
      *
      * @returns {GraphGenerationType} Тип графа: 'SYMM', 'ANTISYMM', 'ASYMM' или
      *     'DEFAULT'.
-     *
-     * @example
-     * const graph = new Graph();
-     * // ...заполнение графа
-     * const type = graph.defineType(); // Например:
-     * GraphGenerationType.SYMMETRICAL
      */
     defineType() {
         let symmetrical = true;
@@ -510,7 +421,7 @@ class Graph {
      * @param {number} i - Индекс начальной вершины.
      * @param {number} j - Индекс конечной вершины.
      * @param {number} val - Новое значение ребра (например, вес или 0 для
-     *     удаления).
+     * удаления).
      */
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
 
@@ -637,10 +548,6 @@ function tropicalMatrixMultiply(first, second) {
  * @param {Graph} graph - Граф, в котором выполняется обход.
  * @param {number} startIndex - Индекс стартовой вершины для начала поиска.
  * @returns {Set<number>} Множество индексов посещённых вершин.
- *
- * @example
- * const visited = BFS(graph, 0);
- * console.log([...visited]); // Например: [0, 1, 3, 4]
  */
 function BFS(graph, startIndex) {
     const visited = new Set();

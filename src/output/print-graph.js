@@ -26,9 +26,9 @@ export function createContentWrapper(container) {
  *
  * @param {Graph} graph - Граф, на основе которого создаются узлы и рёбра.
  * @param {Graph} [answerGraph=null] - Граф с правильным ответом (для
- *     сравнения).
+ * сравнения).
  * @returns {{nodes: vis.DataSet, edges: vis.DataSet}} Объект с узлами и рёбрами
- *     для отрисовки.
+ * для отрисовки.
  */
 function createGraphFromMatrix(graph, answerGraph = null) {
     const nodes = new vis.DataSet([]);
@@ -104,9 +104,9 @@ function createGraphFromMatrix(graph, answerGraph = null) {
  *
  * @param {Graph} graph - Граф, матрица которого будет отображена.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
- *     матрица.
+ * матрица.
  * @param {boolean} [isTrue=false] - Если true, таблица будет окрашена как
- *     завершённая.
+ * завершённая.
  */
 export function renderMatrix(graph, container, isTrue = false) {
     if (!container)
@@ -143,14 +143,14 @@ export function renderMatrix(graph, container, isTrue = false) {
 }
 
 /**
- * Отрисовывает интерактивную матрицу для тренировки.
+ * Отрисовывает интерактивную матрицу для режима тренажера.
  *
  * @param {Graph} graph - Граф, матрица которого будет отрисована.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
- *     матрица.
+ * матрица.
  * @param {Graph} answerGraph - Граф с правильной матрицей для проверки.
  * @param {Function} onComplete - Функция, вызываемая при успешном выполнении
- *     задания.
+ * задания.
  */
 export function renderMatrixTraining(graph, container, answerGraph,
                                      onComplete) {
@@ -238,7 +238,7 @@ export function renderMatrixTraining(graph, container, answerGraph,
  *
  * @param {Graph} graph - Граф, матрица которого будет отрисована.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
- *     матрица.
+ * матрица.
  */
 export function renderMatrixCheck(graph, container) {
     if (!container)
@@ -298,10 +298,11 @@ export function renderMatrixCheck(graph, container) {
 
 /**
  * Анимированно демонстрирует изменение матрицы в реальном времени.
- *
+ * в режиме демонстрации
+ * 
  * @param {Graph} graph - Граф, матрица которого будет анимирована.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
- *     матрица.
+ * матрица.
  * @param {Graph} [answerGraph=null] - Граф с правильным результатом.
  */
 export function renderMatrixDemonstration(graph, container,
@@ -388,7 +389,7 @@ export function checkMatrixCompletion(userMatrix, correctMatrix) {
  * @param {Graph} graph - Граф, который нужно отобразить.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисован граф.
  * @param {Graph} [answerGraph=null] - Граф с правильным ответом (для
- *     подсветки).
+ * подсветки).
  */
 export function displayGraph(graph, container, answerGraph = null) {
     if (!container) {

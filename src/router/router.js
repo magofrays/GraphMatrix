@@ -33,7 +33,7 @@ import {
  * #training, #check).
  * @property {Graph} newGraph - Граф, используемый для текущего уровня/режима.
  * @property {Graph} answerGraph - Граф с правильным результатом.
- * @property {number|null} animationId - ИД текущей анимации (если есть).
+ * @property {number|null} animationId - id текущей анимации (если есть).
  * @property {string} currentInfo - Текстовая информация о текущем режиме и
  * уровне.
  * @property {number} currentLevel - Номер текущего уровня.
@@ -41,9 +41,6 @@ import {
  * @property {Array} storedLevels - Пройденные уровни, сохранённые в памяти.
  * @property {string} multiplyType - Тип умножения матриц: "classic", "logical",
  * "tropical".
- *
- * @example
- * const router = new Router();
  */
 export class Router {
     currentRoute = null;
@@ -338,7 +335,7 @@ export class Router {
     /**
      * Инициализирует уровень проверки.
      */
-    initCheckLevel() { // нужно как-то фиксить это
+    initCheckLevel() {
         const row = document.getElementById('level-row-' + this.currentLevel);
         const checkButton = row.querySelector('.check-answer');
         renderMatrixCheck(this.newGraph, row, this.answerGraph);

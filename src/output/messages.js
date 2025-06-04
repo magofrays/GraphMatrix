@@ -42,6 +42,12 @@ export const showErrorSelectMessage = () => {
     document.getElementById('app').appendChild(completeMessage);
 };
 
+/**
+ * Показывает сообщение об ошибке выбора количества ребер графа.
+ *
+ * Сообщение имеет класс 'error-message' и используется при неправильном
+ * количестве ребер графа.
+ */
 export const showErrorSelectEdgesMessage = () => {
     document.querySelectorAll('.completion-message, .fail-message')
         .forEach(el => el.remove());

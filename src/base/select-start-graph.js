@@ -116,7 +116,7 @@ export class SelectManager {
     /**
      * Возвращает текущий тип графа из выпадающего списка.
      *
-     * @returns {string} Тип графа (например, 'SYMM', 'ASYMM').
+     * @returns {string} Тип графа.
      */
     getGraphType() { return document.getElementById('graph-type').value; }
 
@@ -131,8 +131,7 @@ export class SelectManager {
     }
 
     /**
-     * Возвращает минимально допустимое количество рёбер (обычно vertexCount -
-     * 1).
+     * Возвращает минимально допустимое количество рёбер.
      *
      * @returns {number} Минимальное количество рёбер.
      */
