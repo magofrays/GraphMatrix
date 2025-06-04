@@ -1,4 +1,7 @@
-import {showErrorSelectMessage} from '../output/messages.js';
+import {
+    showErrorSelectMessage,
+    showErrorSelectEdgesMessage
+} from '../output/messages.js';
 import {
     createContentWrapper,
     displayGraph,
@@ -27,7 +30,8 @@ function loadStyles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const selectManager = new SelectManager();
+    const selectManager = SelectManager;
+    selectManager.init();
 
     const router = new Router();
 
@@ -40,8 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             router.restart();
 
-            const countVertex = selectManager.getVertexCount();
             const countEdges = selectManager.getEdgeCount();
+            if (countEdges == -1){
+                showErrorSelectEdgesMessage();
+                return;
+            }
+
+            const countVertex = selectManager.getVertexCount();
             const graphType = selectManager.getGraphType();
 
             AppState.graph = new Graph(countVertex, countEdges, graphType);

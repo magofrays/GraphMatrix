@@ -1,52 +1,144 @@
-export class SelectManager {
-    constructor() {
-        this.graphType = document.getElementById('graph-type');
-        this.vertexCount = document.getElementById('vertex-count');
-        this.edgeCount = document.getElementById('edge-count');
+export const SelectManager = {
+    init() {
+        this.graphType = new TomSelect('#graph-type', {
+            create: false,
+            persist: false,
+            allowEmptyOption: false,
+            onInitialize: function() {
+                this.sync();
+            }
+        });
+
+        this.vertexCount = new TomSelect('#vertex-count', {
+            create: false,
+            persist: false,
+            allowEmptyOption: false,
+            onInitialize: function() {
+                this.sync();
+            }
+        });
+
+        this.edgeCount = new TomSelect('#edge-count', {
+            create: false, 
+            createOnBlur: false, 
+            persist: false,
+            maxOptions: null,
+            placeholder: 'Не выбрано',
+            onInitialize: function() {
+                this.disable();
+            },
+            onType: function(str) {
+                return str.replace(/[^\d]/g, '');
+            }
+        });
         this.setupEvents();
-    };
+    },
 
     setupEvents() {
-        this.vertexCount.addEventListener('change',
-                                          () => this.updateEdgeCount());
-        this.graphType.addEventListener('change', () => this.updateEdgeCount());
-    };
-
+        document.getElementById('vertex-count').addEventListener('change', () => this.updateEdgeCount());
+        document.getElementById('graph-type').addEventListener('change', () => this.updateEdgeCount());
+    },
+  
     getMaxValue(selectedValue) {
-        if (this.graphType.value === "SYMM" ||
-            this.graphType.value == "ANTISYMM") {
+        const currentType = this.graphType.getValue();
+        if (currentType === "SYMM" || currentType == "ANTISYMM"){
             return selectedValue + selectedValue * (selectedValue - 1) / 2;
         }
-        if (this.graphType.value === "ASYMM") {
+        if (currentType === "ASYMM"){
             return selectedValue * (selectedValue - 1) / 2
-        } else {
+        }
+        else{
             return selectedValue * selectedValue;
         }
-    };
-
+    },
+  
     updateEdgeCount() {
-        const value = this.vertexCount.value;
-        this.edgeCount.innerHTML = '';
+        const vertexCount = this.getVertexCount();
+        const min = vertexCount - 1;
+        const max = this.getMaxValue(vertexCount);
 
-        if (value == "-1") {
-            this.edgeCount.add(new Option("Не выбрано", "-1"));
-            this.edgeCount.disabled = true;
+        const currentValue = this.edgeCount.getValue();
+        let newValue;
+        const numericValue = parseInt(Array.isArray(currentValue) ? currentValue[0] : currentValue);
+        if (!isNaN(numericValue) && numericValue >= min && numericValue <= max) {
+            newValue = numericValue;
         } else {
-            this.edgeCount.disabled = false;
-
-            if (value) {
-                const max = this.getMaxValue(parseInt(value));
-                for (let i = 0; i <= max; i++) {
-                    const option = new Option(i, i);
-                    this.edgeCount.add(option);
-                }
-            }
+            newValue = min;
         }
-    };
 
-    getGraphType() { return this.graphType.value; };
+        const edgeCountSelect = document.getElementById('edge-count');
+        edgeCountSelect.innerHTML = '';
 
-    getEdgeCount() { return parseInt(this.edgeCount.value); };
+        if (vertexCount == "-1") {
+            this.edgeCount.clear();
+            this.edgeCount.clearOptions();
+            this.edgeCount.addOption({value: "-1", text: "Не выбрано"});
+            this.edgeCount.disable();
+            return;
+        }
+        this.edgeCount.enable();
+        this.edgeCount.clearOptions();
+        
+        const options = [];
+        
+        for (let i = min; i <= max; i++) {
+            options.push({value: i.toString(), text: i.toString()});
+        }
+        
+        this.edgeCount.addOptions(options);
 
-    getVertexCount() { return parseInt(this.vertexCount.value); };
-}
+        setTimeout(() => {          
+            this.edgeCount.setValue(newValue.toString(), true);
+            this.edgeCount.sync();
+        }, 50);
+    },
+
+    getGraphType() {
+        return document.getElementById('graph-type').value;
+    },
+
+    getVertexCount() {
+        return parseInt(document.getElementById('vertex-count').value);
+    },
+
+    // getEdgeCount() {
+    //     const value = parseInt(this.edgeCount.getValue());
+    //     const min = parseInt(this.edgeCount.min);
+    //     const max = parseInt(this.edgeCount.max);
+    //     alert(value);
+    //     alert(min);
+    //     alert(max);
+        
+    //     if (isNaN(value) || value < min || value > max) {
+    //         return -1;
+    //     }
+    //     return value;
+    // },
+
+    getMinEdges() {
+        return this.getVertexCount() - 1;
+    },
+
+    getMaxEdges() {
+        return this.getMaxValue(this.getVertexCount());
+    },
+
+    getEdgeCount() {
+        const value = this.edgeCount.getValue();
+        if (!value) return -1;
+        
+        const numValue = parseInt(Array.isArray(value) ? value[0] : value);
+        const min = this.getMinEdges();
+        const max = this.getMaxEdges();
+        
+        if (isNaN(numValue) || numValue < min || numValue > max) {
+            return -1;
+        }
+        
+        return numValue;
+    },
+
+    getVertexCount() {
+        return parseInt(document.getElementById('vertex-count').value);
+    }
+};

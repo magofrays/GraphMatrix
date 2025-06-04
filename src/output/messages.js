@@ -22,6 +22,14 @@ export const showErrorSelectMessage = () => {
     document.getElementById('app').appendChild(completeMessage);
 };
 
+export const showErrorSelectEdgesMessage = () => {
+    document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
+    const completeMessage = document.createElement('div');
+    completeMessage.className = 'error-message';
+    completeMessage.textContent = 'Не удастся создать граф с таким количеством ребер';
+    document.getElementById('app').appendChild(completeMessage);
+};
+
 export const showErrorCreateGraphMessage = () => {
     document.querySelectorAll('.completion-message, .fail-message').forEach(el => el.remove());
     const failMessage = document.createElement('div');
