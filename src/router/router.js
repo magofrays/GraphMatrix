@@ -27,7 +27,7 @@ import {
 
 export const Router = {
     currentRoute : null,
-    currentMode: 'check',
+    currentMode : 'check',
     newGraph : null,
     answerGraph : null,
     currentInfo : '',
@@ -132,8 +132,8 @@ export const Router = {
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
-                if (this.currentMode === '#check'){
-                    if (this.isNext){
+                if (this.currentMode === '#check') {
+                    if (this.isNext) {
                         this.isNext = false;
                         this.currentLevel -= 1;
                     }

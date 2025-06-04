@@ -19,6 +19,9 @@ export const AppState = {
     graph : null
 };
 
+/**
+ * Загружает стили в документ
+ */
 function loadStyles() {
     loadModeControlsStyles();
     loadRangeSliderStyles();
