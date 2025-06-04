@@ -96,6 +96,23 @@ body {
   margin-bottom: 10px;
 }
 
+.controls .ts-wrapper {
+  width: 70% !important;
+  margin-bottom: 10px;
+}
+
+.controls .ts-control {
+  padding: 8px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  background: white !important;
+}
+
+.controls .ts-dropdown {
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+}
+
 #generate-graph {
   width: 70%; 
 }

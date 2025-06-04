@@ -40,7 +40,7 @@
   
         <label for="edge-count">Количество ребер в графе:</label>
         <select id="edge-count" disabled>
-          <option value="-1">Не выбрано</option>
+          <option value="">Не выбрано</option>
         </select>
   
         <button id="generate-graph" class="button">Создать граф</button>
@@ -54,7 +54,8 @@
   <div id="app">
   </div>
   
-
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
   <script src="https://unpkg.com/vis-data@latest/peer/umd/vis-data.min.js"></script>
   <script src="https://unpkg.com/vis-network@latest/peer/umd/vis-network.min.js"></script>
   <script type="module" src="./base/app.js"></script>

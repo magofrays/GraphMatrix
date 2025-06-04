@@ -1,4 +1,7 @@
-import {showErrorSelectMessage} from '../output/messages.js';
+import {
+    showErrorSelectEdgesMessage,
+    showErrorSelectMessage
+} from '../output/messages.js';
 import {
     createContentWrapper,
     displayGraph,
@@ -42,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectManager = new SelectManager();
     const router = new Router();
     loadStyles();
+
     /**
      * Обработчик нажатия на кнопку генерации графа.
      *
@@ -56,8 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
             showErrorSelectMessage();
         } else {
             router.restart();
-            const countVertex = selectManager.getVertexCount();
             const countEdges = selectManager.getEdgeCount();
+            if (countEdges == -1) {
+                showErrorSelectEdgesMessage();
+                return;
+            }
+            const countVertex = selectManager.getVertexCount();
             const graphType = selectManager.getGraphType();
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             const container = document.getElementById("controls-container");
