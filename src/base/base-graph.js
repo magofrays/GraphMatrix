@@ -24,25 +24,28 @@ class Graph {
         this.size = size;
         this.edgeNumber = edgeNumber;
         this.genType = genType;
-        this.matrix = Array.from({length : this.size},
-                                 () => new Array(this.size).fill(0));
-        switch (genType) {
-        case GraphGenerationType.DEFAULT:
-            this.generateDefault();
-            break;
-        case GraphGenerationType.SYMMETRICAL:
-            this.generateSymmetrical();
-            break;
-        case GraphGenerationType.ASYMMETRICAL:
-            this.generateAsymmetrical();
-            break;
-        case GraphGenerationType.ANTISYMMETRICAL:
-            this.generateAntisymmetrical();
-            break;
-        default:
-            throw new Error(`Unknown graph generation type: ${genType}`);
+        this.connectedComponents = 0;
+        while (this.connectedComponents != 1) {
+            this.matrix = Array.from({length : this.size},
+                                     () => new Array(this.size).fill(0));
+            switch (genType) {
+            case GraphGenerationType.DEFAULT:
+                this.generateDefault();
+                break;
+            case GraphGenerationType.SYMMETRICAL:
+                this.generateSymmetrical();
+                break;
+            case GraphGenerationType.ASYMMETRICAL:
+                this.generateAsymmetrical();
+                break;
+            case GraphGenerationType.ANTISYMMETRICAL:
+                this.generateAntisymmetrical();
+                break;
+            default:
+                throw new Error(`Unknown graph generation type: ${genType}`);
+            }
+            this.connectedComponents = this.findConnectedComponents();
         }
-        this.connectedComponents = this.findConnectedComponents();
     }
 
     clone(oldGraph) {
@@ -85,7 +88,7 @@ class Graph {
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
-            if (this.matrix[i][j] === 1)
+            if (this.matrix[i][j] == 1)
                 continue;
 
             this.matrix[i][j] = 1;
@@ -98,7 +101,7 @@ class Graph {
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
-            if (this.matrix[i][j] === 1)
+            if (this.matrix[i][j] == 1)
                 continue;
 
             this.matrix[i][j] = 1;
@@ -112,7 +115,7 @@ class Graph {
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
-            if (this.matrix[i][j] === 1 || this.matrix[j][i] === 1)
+            if (this.matrix[i][j] == 1 || this.matrix[j][i] == 1)
                 continue;
 
             this.matrix[i][j] = 1;
@@ -125,7 +128,7 @@ class Graph {
         while (edgesAdded < this.edgeNumber) {
             const i = Math.floor(Math.random() * this.size);
             const j = Math.floor(Math.random() * this.size);
-            if (i === j || this.matrix[i][j] === 1 || this.matrix[j][i] === 1)
+            if (i == j || this.matrix[i][j] == 1 || this.matrix[j][i] == 1)
                 continue;
 
             this.matrix[i][j] = 1;
