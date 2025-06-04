@@ -30,21 +30,22 @@ function loadStyles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    SelectManager.init();
+    const selectManager = new SelectManager();
 
-    Router.init();
+    const router = new Router();
 
     loadStyles();
 
     document.getElementById('generate-graph').addEventListener('click', () => {
-        if (SelectManager.getVertexCount() == -1) {
+        if (selectManager.getVertexCount() == -1) {
             showErrorSelectMessage();
         } else {
-            Router.restart();
 
-            const countVertex = SelectManager.getVertexCount();
-            const countEdges = SelectManager.getEdgeCount();
-            const graphType = SelectManager.getGraphType();
+            router.restart();
+
+            const countVertex = selectManager.getVertexCount();
+            const countEdges = selectManager.getEdgeCount();
+            const graphType = selectManager.getGraphType();
 
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             const container = document.getElementById("controls-container");

@@ -18,5 +18,6 @@ export const appTemplate = `
         </label>
         <button id="apply-multiply" class="button">Применить</button>
     </div>
-
-    <div id="levels-container"></div>`
+    <div class="current-level" id="current-level"></div>
+    <h2 id="history">История:</h2>
+    <div class="levels-container" id="levels-container"></div>`
