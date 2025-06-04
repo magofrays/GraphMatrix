@@ -499,12 +499,47 @@ class Graph {
         }
         return GraphGenerationType.DEFAULT;
     }
-
+    /**
+     * Изменяет значение ребра между вершинами i и j.
+     *
+     * @param {number} i - Индекс начальной вершины.
+     * @param {number} j - Индекс конечной вершины.
+     * @param {number} val - Новое значение ребра (например, вес или 0 для
+     *     удаления).
+     */
     changeEdge(i, j, val) { this.matrix[i][j] = val; }
+
+    /**
+     * Возвращает матрицу смежности графа.
+     *
+     * @type {number[][]}
+     */
     get Matrix() { return this.matrix; }
+
+    /**
+     * Возвращает тип генерации графа.
+     *
+     * @type {string}
+     */
     get GenType() { return this.genType; }
+
+    /**
+     * Возвращает количество рёбер в графе.
+     *
+     * @type {number}
+     */
     get EdgeNumber() { return this.edgeNumber; }
+
+    /**
+     * Возвращает сумму весов всех рёбер графа.
+     *
+     * @type {number}
+     */
     get SumWeights() { return this.sumWeights; }
+
+    /**
+     * Выводит матрицу графа в консоль.
+     */
     printGraph() { console.log(this.matrix); }
 }
 
@@ -624,7 +659,6 @@ function BFS(graph, startIndex) {
 }
 
 export {
-    checkProbability,
     GraphGenerationType,
     Graph,
     classicMatrixMultiply,

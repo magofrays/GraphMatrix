@@ -25,6 +25,26 @@ import {
     appTemplate,
 } from "./templates.js";
 
+/**
+ * Класс, управляющий маршрутизацией и режимами приложения.
+ *
+ * @class Router
+ * @property {string} currentRoute - Текущий хэш-маршрут (#demonstration,
+ * #training, #check).
+ * @property {Graph} newGraph - Граф, используемый для текущего уровня/режима.
+ * @property {Graph} answerGraph - Граф с правильным результатом.
+ * @property {number|null} animationId - ИД текущей анимации (если есть).
+ * @property {string} currentInfo - Текстовая информация о текущем режиме и
+ * уровне.
+ * @property {number} currentLevel - Номер текущего уровня.
+ * @property {number} maxLevel - Максимальное количество уровней.
+ * @property {Array} storedLevels - Пройденные уровни, сохранённые в памяти.
+ * @property {string} multiplyType - Тип умножения матриц: "classic", "logical",
+ * "tropical".
+ *
+ * @example
+ * const router = new Router();
+ */
 export class Router {
     currentRoute = null;
     newGraph = null;
@@ -37,6 +57,14 @@ export class Router {
     storedLevels = [];
     multiplyType = "classic";
 
+    /**
+     * Таблица режимов и их параметров.
+     *
+     * @type {Object}
+     * @property {Object} '#demonstration' - Режим демонстрации.
+     * @property {Object} '#training' - Режим тренировки.
+     * @property {Object} '#check' - Режим проверки.
+     */
     routes = {
         '#demonstration' : {
             mode : 'demonstration',
@@ -58,11 +86,17 @@ export class Router {
         }
     };
 
+    /**
+     * Конструктор. Подписывается на изменение URL-хэша и загружает режим.
+     */
     constructor() {
         window.addEventListener('hashchange', () => this.loadRoute());
         this.loadRoute();
     };
 
+    /**
+     * Перезапускает текущий режим.
+     */
     restart() {
         this.cleanupPreviousMode(true);
         this.answerGraph = null;
@@ -70,6 +104,9 @@ export class Router {
         this.loadRoute();
     };
 
+    /**
+     * Загружает текущий режим из URL и инициализирует его.
+     */
     loadRoute() {
         this.currentMode = window.location.hash || '#demonstration';
         const route = this.routes[this.currentMode];
@@ -83,9 +120,11 @@ export class Router {
         this.bindApplyButton();
     };
 
+    /**
+     * Связывает обработчик кнопки "Применить".
+     */
     bindApplyButton() {
         const applyBtn = document.getElementById('apply-multiply');
-
         applyBtn.addEventListener('click', () => {
             if (!AppState.graph) {
                 showErrorCreateGraphMessage();
@@ -99,6 +138,10 @@ export class Router {
         });
     };
 
+    /**
+     * Очищает элементы UI, связанные с предыдущим режимом.
+     * @param {boolean} deleteNext - Удалить ли кнопку "Следующая степень".
+     */
     cleanElements(deleteNext = false) {
         document.querySelectorAll('.check-answer').forEach(btn => btn.remove());
         document.querySelectorAll('.speed-control')
@@ -111,19 +154,21 @@ export class Router {
         }
     };
 
+    /**
+     * Очищает состояние предыдущего режима.
+     * @param {boolean} clearLevels - Очистить ли уровень и хранилище.
+     */
     cleanupPreviousMode(clearLevels = false) {
         if (clearLevels) {
             this.storedLevels = [];
             this.isNext = false;
         }
-
         if (window.currentAnimation) {
             clearTimeout(window.currentAnimation);
         }
         if (window.currentCheck) {
             clearTimeout(window.currentCheck);
         }
-
         const levelsContainer = document.getElementById('levels-container');
         const currentLevel = document.getElementById('current-level');
         if (levelsContainer) {
@@ -135,6 +180,9 @@ export class Router {
         this.cleanElements(true);
     };
 
+    /**
+     * Инициализирует текущий режим.
+     */
     initializeMode() {
         if (this.newGraph && this.answerGraph) {
             if (this.currentLevel <= this.maxLevel) {
@@ -159,6 +207,9 @@ export class Router {
         }
     };
 
+    /**
+     * Отображает текущий уровень в интерфейсе.
+     */
     showCurrentMode() {
         let container = document.getElementById('current-level');
         this.createLevelRow(container, this.currentRoute.rowTemplate,
@@ -166,6 +217,14 @@ export class Router {
         this.currentRoute.initLevel(this);
     };
 
+    /**
+     * Создаёт строку уровня.
+     * @param {HTMLElement} container - Контейнер для строки уровня.
+     * @param {string} template - Шаблон строки.
+     * @param {number} level - Номер уровня.
+     * @param {string} multiplyType - Тип умножения матриц.
+     * @returns {HTMLElement} - Созданная строка уровня.
+     */
     createLevelRow(container, template, level, multiplyType) {
         const row = document.createElement('div');
         row.id = 'level-row-' + level;
@@ -179,10 +238,13 @@ export class Router {
         return row;
     };
 
+    /**
+     * Создаёт матрицу для проверки и для заполнения на основе текущего уровня и
+     * типа умножения.
+     */
     createTestMatrices() {
         this.answerGraph = new Graph;
         this.answerGraph.clone(AppState.graph);
-
         switch (this.multiplyType) {
         case 'classic':
             this.answerGraph.classicMultiply(this.currentLevel);
@@ -194,7 +256,6 @@ export class Router {
             this.answerGraph.tropicalMultiply(this.currentLevel);
             break;
         }
-
         this.newGraph = new Graph(AppState.graph.size, 0, AppState.GenType);
         for (let i = 0; i < AppState.graph.size; i++) {
             for (let j = 0; j < AppState.graph.size; j++) {
@@ -203,6 +264,11 @@ export class Router {
         }
     };
 
+    /**
+     * Проверяет выполнение задания и переходит к следующему уровню.
+     * @param {number} currentLevelBeforeChange - Номер уровня до изменения.
+     * @param {HTMLElement} row - Строка уровня в интерфейсе.
+     */
     checkGood(currentLevelBeforeChange, row) {
         if (checkMatrixCompletion(this.newGraph.Matrix,
                                   this.answerGraph.Matrix)) {
@@ -220,10 +286,26 @@ export class Router {
             () => { this.checkGood(currentLevelBeforeChange, row); }, 1000);
     }
 
+    /**
+     * Выполняется по завершении уровня.
+     * @param {HTMLElement} row - Строка уровня в интерфейсе.
+     */
+    onComplete(row) {
+        if (!this.isNext)
+            this.currentLevel++;
+        if (this.currentLevel - 1 < this.maxLevel) {
+            this.createNextLevelButton(row);
+        } else {
+            this.addToStorage();
+        }
+    };
+
+    /**
+     * Инициализирует уровень демонстрации.
+     */
     initDemonstrationLevel() {
         const row = document.getElementById('level-row-' + this.currentLevel);
         const currentLevelBeforeChange = this.currentLevel;
-
         renderMatrixDemonstration(this.newGraph, row, this.answerGraph);
         if (this.isNext) {
             if (this.currentLevel - 1 < this.maxLevel) {
@@ -236,16 +318,9 @@ export class Router {
         }
     };
 
-    onComplete(row) {
-        if (!this.isNext)
-            this.currentLevel++;
-        if (this.currentLevel - 1 < this.maxLevel) {
-            this.createNextLevelButton(row);
-        } else {
-            this.addToStorage();
-        }
-    };
-
+    /**
+     * Инициализирует уровень тренировки.
+     */
     initTrainingLevel() {
         const row = document.getElementById('level-row-' + this.currentLevel);
         renderMatrixTraining(this.newGraph, row, this.answerGraph, () => {
@@ -259,13 +334,14 @@ export class Router {
         });
     };
 
+    /**
+     * Инициализирует уровень проверки.
+     */
     initCheckLevel() { // нужно как-то фиксить это
         const row = document.getElementById('level-row-' + this.currentLevel);
         const checkButton = row.querySelector('.check-answer');
-
         renderMatrixCheck(this.newGraph, row, this.answerGraph);
         checkButton.removeEventListener('click', this.handleCheckClick);
-
         if (this.isNext) {
             if (this.currentLevel - 1 < this.maxLevel) {
                 this.createNextLevelButton(row);
@@ -287,27 +363,30 @@ export class Router {
                 }
             };
         }
-
         checkButton.addEventListener('click', this.handleCheckClick);
     };
 
+    /**
+     * Создаёт кнопку "Следующая степень".
+     * @param {HTMLElement} row - Строка уровня.
+     */
     createNextLevelButton(row) {
         this.isNext = true;
-
         const nextLevelButton = document.createElement('button');
         nextLevelButton.textContent = 'Следующая степень';
         nextLevelButton.className = 'button next-level-button';
-
         nextLevelButton.addEventListener('click', () => {
             this.isNext = false;
             this.addToStorage();
             this.printNext();
         });
-
         row.insertAdjacentElement('afterend', nextLevelButton);
     };
 
-    printNext() { // подумать надо
+    /**
+     * Переход к следующему уровню.
+     */
+    printNext() {
         const levelsContainer = document.getElementById('levels-container');
         const currentLevel = document.getElementById('current-level');
         levelsContainer.innerHTML = '';
@@ -318,6 +397,12 @@ export class Router {
         this.outputStorage();
     };
 
+    /**
+     * Возвращает человеко-читаемое имя типа умножения.
+     * @param {string} multiplyType - Тип умножения ("classic", "logical",
+     *     "tropical").
+     * @returns {string} - Читаемое название.
+     */
     getMultiplyTypeName(multiplyType) {
         switch (multiplyType) {
         case 'classic':
@@ -331,6 +416,9 @@ export class Router {
         }
     };
 
+    /**
+     * Обновляет информацию о текущем уровне и типе умножения.
+     */
     updateInfo() {
         if (this.storedLevels.length === 0) {
             this.multiplyType = document.getElementById('multiply-type').value;
@@ -344,6 +432,9 @@ export class Router {
         }
     };
 
+    /**
+     * Добавляет пройденный уровень в хранилище.
+     */
     addToStorage() {
         if (this.storedLevels.length < this.maxLevel &&
             this.currentLevel - 1 <= this.maxLevel) {
@@ -355,6 +446,9 @@ export class Router {
         }
     };
 
+    /**
+     * Выводит историю в интерфейс.
+     */
     outputStorage() {
         const levelsContainer = document.getElementById('levels-container');
         for (const level of this.storedLevels) {
@@ -367,6 +461,12 @@ export class Router {
         }
     }
 
+    /**
+     * Формирует текстовое описание уровня и типа умножения.
+     * @param {number} level - Номер уровня.
+     * @param {string} multiplyType - Тип умножения.
+     * @returns {string} - Текстовое описание.
+     */
     createInfo(level, multiplyType = this.multiplyType) {
         const typeName = this.getMultiplyTypeName(multiplyType);
         return `Тип умножения: ${typeName}\nСтепень: ${level}`;

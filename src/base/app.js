@@ -31,22 +31,16 @@ function loadStyles() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const selectManager = new SelectManager();
-
     const router = new Router();
-
     loadStyles();
-
     document.getElementById('generate-graph').addEventListener('click', () => {
         if (selectManager.getVertexCount() == -1) {
             showErrorSelectMessage();
         } else {
-
             router.restart();
-
             const countVertex = selectManager.getVertexCount();
             const countEdges = selectManager.getEdgeCount();
             const graphType = selectManager.getGraphType();
-
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             const container = document.getElementById("controls-container");
             createContentWrapper(container);
