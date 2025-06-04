@@ -1,5 +1,11 @@
 import {showCompletionMessage} from "./messages.js";
 
+/**
+ * Создаёт или обновляет контейнер с классом "content-wrapper" внутри указанного
+ * элемента.
+ *
+ * @param {HTMLElement} container - Элемент, в который добавляется контейнер.
+ */
 export function createContentWrapper(container) {
     if (!container)
         return;
@@ -15,6 +21,15 @@ export function createContentWrapper(container) {
                     `);
 }
 
+/**
+ * Создаёт набор узлов и рёбер на основе матрицы графа для отрисовки графа.
+ *
+ * @param {Graph} graph - Граф, на основе которого создаются узлы и рёбра.
+ * @param {Graph} [answerGraph=null] - Граф с правильным ответом (для
+ *     сравнения).
+ * @returns {{nodes: vis.DataSet, edges: vis.DataSet}} Объект с узлами и рёбрами
+ *     для отрисовки.
+ */
 function createGraphFromMatrix(graph, answerGraph = null) {
     const nodes = new vis.DataSet([]);
     const edges = new vis.DataSet([]);
@@ -26,7 +41,6 @@ function createGraphFromMatrix(graph, answerGraph = null) {
             label : `${i}`,
         });
     }
-
     const graphType = graph.GenType;
     let border = matrix.length;
     let addColor = "#effde7";
@@ -82,21 +96,27 @@ function createGraphFromMatrix(graph, answerGraph = null) {
             }
         }
     }
-
     return {nodes, edges};
 }
 
+/**
+ * Отрисовывает матрицу графа в указанном контейнере.
+ *
+ * @param {Graph} graph - Граф, матрица которого будет отображена.
+ * @param {HTMLElement} container - Контейнер, в котором будет отрисована
+ *     матрица.
+ * @param {boolean} [isTrue=false] - Если true, таблица будет окрашена как
+ *     завершённая.
+ */
 export function renderMatrix(graph, container, isTrue = false) {
     if (!container)
         return;
     let matrixContainer = container.querySelector(".matrix-container");
     const table = document.createElement("table");
     table.className = "graph-matrix";
-
     const matrix = graph.Matrix;
     const headerRow = document.createElement("tr");
     headerRow.appendChild(document.createElement("th"));
-
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
         th.textContent = j;
@@ -122,6 +142,16 @@ export function renderMatrix(graph, container, isTrue = false) {
     matrixContainer.appendChild(table);
 }
 
+/**
+ * Отрисовывает интерактивную матрицу для тренировки.
+ *
+ * @param {Graph} graph - Граф, матрица которого будет отрисована.
+ * @param {HTMLElement} container - Контейнер, в котором будет отрисована
+ *     матрица.
+ * @param {Graph} answerGraph - Граф с правильной матрицей для проверки.
+ * @param {Function} onComplete - Функция, вызываемая при успешном выполнении
+ *     задания.
+ */
 export function renderMatrixTraining(graph, container, answerGraph,
                                      onComplete) {
     if (!container)
@@ -139,17 +169,13 @@ export function renderMatrixTraining(graph, container, answerGraph,
         headerRow.appendChild(th);
     }
     table.appendChild(headerRow);
-
     for (let i = 0; i < matrix.length; i++) {
         const row = document.createElement("tr");
-
         const th = document.createElement("th");
         th.textContent = i;
         row.appendChild(th);
-
         for (let j = 0; j < matrix[i].length; j++) {
             const td = document.createElement("td");
-
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 4;
@@ -157,7 +183,6 @@ export function renderMatrixTraining(graph, container, answerGraph,
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
                 input.value = matrix[i][j];
-
                 const correctValue = answerGraph.Matrix[i][j];
                 if (matrix[i][j] == correctValue) {
                     input.style.backgroundColor = "#e3f8d8";
@@ -165,25 +190,20 @@ export function renderMatrixTraining(graph, container, answerGraph,
                     input.style.backgroundColor = "#ffaaaa";
                 }
             }
-
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
                 if (!/^\d*$/.test(value)) {
                     e.target.value = value.replace(/[^\d]/g, '');
                 }
             });
-
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
-
                 let value =
                     e.target.value === '' ? -1 : parseInt(e.target.value);
                 if (isNaN(value))
                     value = -1;
-
                 graph.changeEdge(row, col, value);
-
                 const correctValue = answerGraph.Matrix[row][col];
                 if (value == -1) {
                     e.target.style.backgroundColor = "#f9f9f9";
@@ -192,33 +212,34 @@ export function renderMatrixTraining(graph, container, answerGraph,
                 } else {
                     e.target.style.backgroundColor = "#ffaaaa";
                 }
-
                 if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
                     showCompletionMessage();
                     lockMatrixInputs(matrixContainer);
                     onComplete();
                 }
-
                 displayGraph(graph, container, answerGraph);
             });
-
             td.appendChild(input);
             row.appendChild(td);
         }
-
         table.appendChild(row);
     }
-
     displayGraph(graph, container, answerGraph);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
-
     if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
         lockMatrixInputs(matrixContainer);
         onComplete(container);
     }
 }
 
+/**
+ * Отрисовывает интерактивную матрицу для режима проверки.
+ *
+ * @param {Graph} graph - Граф, матрица которого будет отрисована.
+ * @param {HTMLElement} container - Контейнер, в котором будет отрисована
+ *     матрица.
+ */
 export function renderMatrixCheck(graph, container) {
     if (!container)
         return;
@@ -249,14 +270,12 @@ export function renderMatrixCheck(graph, container) {
             if (matrix[i][j] != -1) {
                 input.value = matrix[i][j];
             }
-
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
                 if (!/^\d*$/.test(value)) {
                     e.target.value = value.replace(/[^\d]/g, '');
                 }
             });
-
             input.addEventListener('change', (e) => {
                 const row = parseInt(e.target.dataset.row);
                 const col = parseInt(e.target.dataset.col);
@@ -267,39 +286,39 @@ export function renderMatrixCheck(graph, container) {
                 graph.changeEdge(row, col, value);
                 displayGraph(graph, container);
             });
-
             td.appendChild(input);
             row.appendChild(td);
         }
-
         table.appendChild(row);
     }
-
     displayGraph(graph, container);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
 }
 
+/**
+ * Анимированно демонстрирует изменение матрицы в реальном времени.
+ *
+ * @param {Graph} graph - Граф, матрица которого будет анимирована.
+ * @param {HTMLElement} container - Контейнер, в котором будет отрисована
+ *     матрица.
+ * @param {Graph} [answerGraph=null] - Граф с правильным результатом.
+ */
 export function renderMatrixDemonstration(graph, container,
                                           answerGraph = null) {
     if (!container)
         return;
     const matrixContainer = container.querySelector('.matrix-container');
-
     if (window.currentAnimation) {
         clearTimeout(window.currentAnimation);
     }
-
     matrixContainer.innerHTML = '';
     const table = document.createElement("table");
     table.className = "graph-matrix";
-
     const matrix = graph.Matrix;
     const answerMatrix = answerGraph.Matrix;
-
     const headerRow = document.createElement("tr");
     headerRow.appendChild(document.createElement("th"));
-
     for (let j = 0; j < matrix.length; j++) {
         const th = document.createElement("th");
         th.textContent = j;
@@ -323,15 +342,12 @@ export function renderMatrixDemonstration(graph, container,
         table.appendChild(row);
     }
     matrixContainer.appendChild(table);
-
     const speedControl = container.querySelector('.speed-control');
     let speed = 3500 - parseInt(speedControl.value);
     speedControl.addEventListener(
         'input', () => { speed = 3500 - parseInt(speedControl.value); });
-
     let currentStep = 0;
     const totalSteps = matrix.length * matrix.length;
-
     const animateStep = () => {
         if (currentStep >= totalSteps)
             return;
@@ -348,6 +364,13 @@ export function renderMatrixDemonstration(graph, container,
     animateStep();
 }
 
+/**
+ * Проверяет, совпадает ли пользовательская матрица с правильной.
+ *
+ * @param {number[][]} userMatrix - Матрица пользователя.
+ * @param {number[][]} correctMatrix - Правильная матрица.
+ * @returns {boolean} true, если матрицы совпадают.
+ */
 export function checkMatrixCompletion(userMatrix, correctMatrix) {
     for (let i = 0; i < userMatrix.length; i++) {
         for (let j = 0; j < userMatrix[i].length; j++) {
@@ -359,18 +382,23 @@ export function checkMatrixCompletion(userMatrix, correctMatrix) {
     return true;
 }
 
+/**
+ * Отображает граф визуально в указанном контейнере.
+ *
+ * @param {Graph} graph - Граф, который нужно отобразить.
+ * @param {HTMLElement} container - Контейнер, в котором будет отрисован граф.
+ * @param {Graph} [answerGraph=null] - Граф с правильным ответом (для
+ *     подсветки).
+ */
 export function displayGraph(graph, container, answerGraph = null) {
     if (!container) {
         return;
     }
     let graphContainer = container.querySelector(".graph-container");
     const graphData = createGraphFromMatrix(graph, answerGraph);
-
     graphContainer.style.width = '450px';
     graphContainer.style.height = '450px';
-
     const data = {nodes : graphData.nodes, edges : graphData.edges};
-
     const options = {
         layout : {randomSeed : 42, improvedLayout : false},
         nodes : {
@@ -421,19 +449,15 @@ export function displayGraph(graph, container, answerGraph = null) {
         height : '100%',
         autoResize : false
     };
-
     const nodeCount = data.nodes.length;
     const radius = 170;
     const center = {x : 200, y : 210};
-
     data.nodes.forEach((node, i) => {
         const angle = (i * 2 * Math.PI) / nodeCount - 7;
         node.x = center.x + radius * Math.cos(angle);
         node.y = center.y + radius * Math.sin(angle);
     });
-
     const network = new vis.Network(graphContainer, data, options);
-
     network.once('stabilizationIterationsDone', function() {
         network.setOptions({
             nodes :
@@ -443,6 +467,11 @@ export function displayGraph(graph, container, answerGraph = null) {
     });
 }
 
+/**
+ * Блокирует поля ввода матрицы, делая их только для чтения.
+ *
+ * @param {HTMLElement} matrixContainer - Контейнер матрицы.
+ */
 export function lockMatrixInputs(matrixContainer) {
     const inputs = matrixContainer.querySelectorAll('input[type="text"]');
     inputs.forEach(input => {
