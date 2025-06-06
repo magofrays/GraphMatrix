@@ -186,7 +186,6 @@ export class Router {
                 if (this.currentMode === '#check') {
                     if (this.isNext) {
                         this.isNext = false;
-                        this.currentLevel -= 1;
                     }
                     this.createTestMatrices();
                 }
@@ -264,24 +263,21 @@ export class Router {
 
     /**
      * Проверяет выполнение задания и переходит к следующему уровню.
-     * @param {number} currentLevelBeforeChange - Номер уровня до изменения.
      * @param {HTMLElement} row - Строка уровня в интерфейсе.
      */
-    checkGood(currentLevelBeforeChange, row) {
+    checkGood(row) {
         if (checkMatrixCompletion(this.newGraph.Matrix,
                                   this.answerGraph.Matrix)) {
             this.cleanElements();
-            this.currentLevel = currentLevelBeforeChange + 1;
-            if (this.currentLevel - 1 < this.maxLevel) {
+            if (this.currentLevel /*- 1*/ < this.maxLevel) {
                 this.createNextLevelButton(row);
             } else {
-                this.addToStorage();
                 renderMatrix(this.answerGraph, row, true);
             }
             return;
         }
         window.currentCheck = setTimeout(
-            () => { this.checkGood(currentLevelBeforeChange, row); }, 1000);
+            () => { this.checkGood(row); }, 1000);
     }
 
     /**
@@ -289,13 +285,9 @@ export class Router {
      * @param {HTMLElement} row - Строка уровня в интерфейсе.
      */
     onComplete(row) {
-        if (!this.isNext)
-            this.currentLevel++;
-        if (this.currentLevel - 1 < this.maxLevel) {
+        if (this.currentLevel < this.maxLevel) {
             this.createNextLevelButton(row);
-        } else {
-            this.addToStorage();
-        }
+        } 
     };
 
     /**
@@ -303,16 +295,13 @@ export class Router {
      */
     initDemonstrationLevel() {
         const row = document.getElementById('level-row-' + this.currentLevel);
-        const currentLevelBeforeChange = this.currentLevel;
         renderMatrixDemonstration(this.newGraph, row, this.answerGraph);
         if (this.isNext) {
-            if (this.currentLevel - 1 < this.maxLevel) {
+            if (this.currentLevel < this.maxLevel) {
                 this.createNextLevelButton(row);
-            } else {
-                this.addToStorage();
             }
         } else {
-            this.checkGood(currentLevelBeforeChange, row);
+            this.checkGood(row);
         }
     };
 
@@ -322,12 +311,8 @@ export class Router {
     initTrainingLevel() {
         const row = document.getElementById('level-row-' + this.currentLevel);
         renderMatrixTraining(this.newGraph, row, this.answerGraph, () => {
-            if (!this.isNext)
-                this.currentLevel++;
-            if (this.currentLevel - 1 < this.maxLevel) {
+            if (this.currentLevel < this.maxLevel) {
                 this.createNextLevelButton(row);
-            } else {
-                this.addToStorage();
             }
         });
     };
@@ -341,10 +326,8 @@ export class Router {
         renderMatrixCheck(this.newGraph, row, this.answerGraph);
         checkButton.removeEventListener('click', this.handleCheckClick);
         if (this.isNext) {
-            if (this.currentLevel - 1 < this.maxLevel) {
+            if (this.currentLevel < this.maxLevel) {
                 this.createNextLevelButton(row);
-            } else {
-                this.addToStorage();
             }
         } else {
             this.handleCheckClick = () => {
@@ -374,6 +357,7 @@ export class Router {
         nextLevelButton.textContent = 'Следующая степень';
         nextLevelButton.className = 'button next-level-button';
         nextLevelButton.addEventListener('click', () => {
+            this.currentLevel++;
             this.isNext = false;
             this.addToStorage();
             this.printNext();
@@ -435,7 +419,7 @@ export class Router {
      */
     addToStorage() {
         if (this.storedLevels.length < this.maxLevel &&
-            this.currentLevel - 1 <= this.maxLevel) {
+            this.currentLevel /*- 1*/ <= this.maxLevel) {
             const storedGraph = new Graph();
             storedGraph.clone(this.answerGraph);
             const currentLevel = this.currentLevel - 1;
