@@ -94,11 +94,27 @@ export class Router {
     /**
      * Перезапускает текущий режим.
      */
-    restart() {
+    restart(maxLevel) {
         this.cleanupPreviousMode(true);
         this.answerGraph = null;
         this.newGraph = null;
+        this.maxLevel = maxLevel;
         this.loadRoute();
+        this.changePowerOption();
+    };
+
+    /**
+     * Меняет значение возможных степеней.
+     */
+    changePowerOption(){
+        const powerSelect = document.getElementById('power');
+        powerSelect.innerHTML = '';
+        for (let i = 1; i <= this.maxLevel; i++) {
+            const optionElement = document.createElement('option');
+            optionElement.value = i.toString();
+            optionElement.textContent = i.toString(); 
+            powerSelect.appendChild(optionElement);
+        }
     };
 
     /**

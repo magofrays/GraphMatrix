@@ -59,13 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectManager.getVertexCount() == -1) {
             showErrorSelectMessage();
         } else {
-            router.restart();
+            const countVertex = selectManager.getVertexCount();
+            router.restart(countVertex);
             const countEdges = selectManager.getEdgeCount();
             if (countEdges == -1) {
                 showErrorSelectEdgesMessage();
                 return;
             }
-            const countVertex = selectManager.getVertexCount();
             const graphType = selectManager.getGraphType();
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             const container = document.getElementById("controls-container");
