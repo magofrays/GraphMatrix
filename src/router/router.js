@@ -109,7 +109,7 @@ export class Router {
     changePowerOption(){
         const powerSelect = document.getElementById('power');
         powerSelect.innerHTML = '';
-        for (let i = 1; i <= this.maxLevel; i++) {
+        for (let i = 2; i <= this.maxLevel; i++) {
             const optionElement = document.createElement('option');
             optionElement.value = i.toString();
             optionElement.textContent = i.toString(); 
