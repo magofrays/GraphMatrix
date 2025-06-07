@@ -178,7 +178,7 @@ export function renderMatrixTraining(graph, container, answerGraph,
             const td = document.createElement("td");
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 4;
+            input.maxLength = 8;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
@@ -264,7 +264,7 @@ export function renderMatrixCheck(graph, container) {
             const td = document.createElement("td");
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 4;
+            input.maxLength = 8;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {

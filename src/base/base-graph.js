@@ -233,6 +233,9 @@ class Graph {
             if (this.matrix[idx][i]) {
                 result.push(i);
             }
+            if (this.matrix[i][idx]) {
+                result.push(i);
+            }
         }
         return result;
     }
