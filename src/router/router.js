@@ -100,7 +100,6 @@ export class Router {
         this.newGraph = null;
         this.maxLevel = maxLevel;
         this.loadRoute();
-        this.changePowerOption();
     };
 
     /**
@@ -131,6 +130,7 @@ export class Router {
         multiplyTypeSelect.value = this.multiplyType;
         this.initializeMode();
         this.bindApplyButton();
+        this.changePowerOption();
     };
 
     /**
