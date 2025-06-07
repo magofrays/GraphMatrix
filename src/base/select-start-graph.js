@@ -97,6 +97,7 @@ export class SelectManager {
             return;
         }
         this.edgeCount.enable();
+        this.edgeCount.clear();
         this.edgeCount.clearOptions();
 
         const options = [];
