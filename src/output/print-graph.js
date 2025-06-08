@@ -5,7 +5,7 @@ const appColors =
         redArrow : "#FF4500",
         greenArrow : "#3f8534",
         greenCell : "#e3f8d8",
-        highlightArrow : "#848484",
+        highlightArrow : "#cd00cd",
         redCell : "#ffaaaa",
         defaultCell : "#f9f9f9"
     }
@@ -482,7 +482,7 @@ export function displayGraph(graph, container, answerGraph = null) {
                 color : '#6a9f6a',
                 opacity : 1.0,
                 highlight : '#4a7c4a',
-                hover : '#848484'
+                hover : appColors.highlightArrow,
             },
             width : 2,
             selectionWidth : 4,
