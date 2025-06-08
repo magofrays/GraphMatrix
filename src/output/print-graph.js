@@ -104,12 +104,12 @@ function createGraphFromMatrix(graph, answerGraph = null) {
 
 function signCellToEdge(uiGraph, cell, i, j) {
     const edge =
-        uiGraph.edges.get({filter : e => e.from === i && e.to === j})[0];
+        uiGraph.ui.edges.get({filter : e => e.from === i && e.to === j})[0];
 
     if (edge) {
         const edgeColor = edge.color?.color;
         cell.addEventListener('mouseover', () => {
-            uiGraph.edges.update({
+            uiGraph.ui.edges.update({
                 id : edge.id,
                 color : {
                     color : appColors.highlightArrow,
@@ -118,7 +118,7 @@ function signCellToEdge(uiGraph, cell, i, j) {
             });
         });
         cell.addEventListener('mouseleave', () => {
-            uiGraph.edges.update({
+            uiGraph.ui.edges.update({
                 id : edge.id,
                 color : {
                     color : edgeColor,
@@ -329,7 +329,7 @@ export function renderMatrixCheck(graph, container, answerGraph) {
 function changeEdge(uiGraph, i, j, arrowColor, value) {
     removeEdge(uiGraph, i, j);
     if (value > 0) {
-        uiGraph.edges.add({
+        uiGraph.ui.edges.add({
             from : i,
             to : j,
             color : {color : arrowColor},
@@ -339,13 +339,15 @@ function changeEdge(uiGraph, i, j, arrowColor, value) {
             font : {color : arrowColor}
         });
     }
+    uiGraph.network.fit(
+        {animation : {duration : 1000, easingFunction : "easeInOutQuad"}});
 }
 
 function removeEdge(uiGraph, i, j) {
     const edge =
-        uiGraph.edges.get({filter : e => e.from === i && e.to === j})[0];
+        uiGraph.ui.edges.get({filter : e => e.from === i && e.to === j})[0];
     if (edge)
-        uiGraph.edges.remove(edge.id);
+        uiGraph.ui.edges.remove(edge.id);
 }
 /**
  * Анимированно демонстрирует изменение матрицы в реальном времени.
@@ -442,8 +444,8 @@ export function displayGraph(graph, container, answerGraph = null) {
     }
     let graphContainer = container.querySelector(".graph-container");
     const graphData = createGraphFromMatrix(graph, answerGraph);
-    graphContainer.style.width = '400px';
-    graphContainer.style.height = '400px';
+    graphContainer.style.width = '370px';
+    graphContainer.style.height = '370px';
     const data = {nodes : graphData.nodes, edges : graphData.edges};
     const options = {
         layout : {
@@ -476,17 +478,6 @@ export function displayGraph(graph, container, answerGraph = null) {
                 x : 5,
                 y : 5
             },
-            scaling : {
-                min : 30,
-                max : 30,
-                label : {
-                    enabled : true,
-                    min : 14,
-                    max : 30,
-                    maxVisible : 30,
-                    drawThreshold : 5
-                }
-            }
         },
         edges : {
             selfReference : {size : 20, angle : Math.PI / 4},
@@ -494,7 +485,7 @@ export function displayGraph(graph, container, answerGraph = null) {
                 color : '#6a9f6a',
                 opacity : 1.0,
                 highlight : '#4a7c4a',
-                hover : '#4a7c4a'
+                hover : '#848484'
             },
             width : 2,
             selectionWidth : 4,
@@ -520,7 +511,7 @@ export function displayGraph(graph, container, answerGraph = null) {
             dragView : false,
             dragNodes : false,
             multiselect : false,
-            // hover : {zoom : false, drag : false}
+            hover : true,
         },
         physics : {
             enabled : true,
@@ -529,16 +520,18 @@ export function displayGraph(graph, container, answerGraph = null) {
                 iterations : 50, // Меньше итераций = быстрее
                 updateInterval : 10 // Чаще обновляем
             },
-            solver : 'repulsion', // Быстрый алгоритм
+            solver : 'repulsion',
             repulsion : {
-                nodeDistance : 70,
-                damping : 0.5 // Меньше "пружинность"
+                nodeDistance : 1,
+                springLength : 1,
+                springConstant : 0,
+                centralGravity : 0.1
             }
         },
         configure : {enabled : false},
         width : '100%',
         height : '100%',
-        autoResize : true
+        autoResize : true,
     };
     const nodeCount = data.nodes.length;
     const radius = 170;
@@ -549,16 +542,7 @@ export function displayGraph(graph, container, answerGraph = null) {
         node.y = center.y + radius * Math.sin(angle);
     });
     const network = new vis.Network(graphContainer, data, options);
-
-    network.on('stabilizationIterationsDone', () => {
-        network.fit({
-            animation : {
-                duration : 100, // Очень короткая анимация (100ms)
-                easingFunction : 'linear'
-            }
-        });
-    });
-    return data;
+    return {ui : data, network : network};
 }
 
 /**

@@ -1,92 +1,45 @@
-.level-row {
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-}
-
-.level-row:last-child {
-    border-bottom: none;
-}
-
-/* #levels-container {
-    margin-top: 20px;
-    height: 100%;
-} */
-
 #history-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* 2 колонки */
-  gap: 10px;  /* Отступ между элементами */
-  margin-bottom: 20px;
-  justify-items: center;
-}
-
-.hisory-item {
-  background: #f0f0f0;
-  padding: 20px;
-  text-align: center;
-  border: 1px solid #ddd;
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; 
 }
 
 .check-answer {
     margin-top: 20px;
     width: 200px;
-    text-align: center;      /* Горизонтальное центрирование текста */
-    /* margin-left: 20px; */
+    text-align: center; 
 }
-
-.result-row {
-  display: flex;
-  gap: 5px;
-  align-items: flex-start;
-  justify-content: space-between;
-  border-radius: 5px;
-  background: #f9f9f9;
-  padding: 15px;
-  border: 2px solid #ddd;
-}
-
-
-
 
 .global-value {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* 2 колонки */
+  grid-template-columns: 1fr 1fr; 
   grid-template-rows: auto auto auto;
   justify-items: center;
   gap: 10px;
 }
 
 .global-item-1 {
-  grid-column: 1;  /* Первая колонка */
-  grid-row: 1;     /* Первая строка */
+  grid-column: 1; 
+  grid-row: 1;
 }
 
 .global-item-2 {
-  grid-column: 2;  /* Вторая колонка */
-  grid-row: 1;     /* Первая строка */
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .global-item-3 {
-  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
-  grid-row: 2;              /* Вторая строка */
-  display: flex;
+  grid-column: 1 / span 2;
+  grid-row: 2;
   justify-self: center;
 }
 
 .global-item-4 {
-  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
-  grid-row: 3;              /* Вторая строка */
-  display: flex;
+  grid-column: 1 / span 2;
+  grid-row: 3;
   justify-self: center;
 }
 
-/* .result-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  flex: 0 0 400px; 
-  min-width: 200px;
-} */
 
 .content-text-container {
   text-decoration: none;

@@ -94,9 +94,7 @@ body {
     height : 100px;
 } */
 
-#matrix-container {
-  flex: 0 0 100%;
-}
+
 
 .controls select {
   width: 70%; 
@@ -128,13 +126,16 @@ body {
   width: 70%; 
 }
 
+
 .graph-container {
   flex: 0 0 450px;
   width: 450px;
   border :2px solid #3f8534;
   border-radius: 4px;
+  margin-top: 10px;
 background: white;
 } 
+
 
 
 .button {
@@ -148,7 +149,9 @@ background: white;
 }
 
 .next-level-button {
-  margin-left: 20px;
+  margin-top: 20px;
+  width: 200px;
+  text-align: center;  
 }
 
 
@@ -177,12 +180,8 @@ background: white;
 }
 
 .content-wrapper {
-  /* flex: 0.8;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly; */
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* 2 колонки */
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
 
   border: 3px solid #cbfbb1; 
@@ -192,22 +191,23 @@ background: white;
   gap: 0px;
   background-color: #effde7;
   box-sizing: border-box;
-  width: 700px;
-  height: 350px;
+  width: 100%;
+  height: 460px;
 }
 
 .wrapper-item-1 {
-  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
-  grid-row: 1;              /* Вторая строка */
-  text-align: center;       /* Выравниваем текст по центру */
+  grid-column: 1 / span 2;
+  grid-row: 1;
+  text-align: center; 
+  height: 30px;
 }
 
 .wrapper-item-2 {
-  grid-column: 1;  /* Первая колонка */
-  grid-row: 2;     /* Первая строка */
+  grid-column: 1;
+  grid-row: 2; 
 }
 
 .wrapper-item-3 {
-  grid-column: 2;  /* Вторая колонка */
-  grid-row: 2;     /* Первая строка */
+  grid-column: 2;  
+  grid-row: 2;
 }

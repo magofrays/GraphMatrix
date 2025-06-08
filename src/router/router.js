@@ -16,11 +16,6 @@ import {
 } from "../output/print-graph.js";
 
 import {
-    resultRowTemplate,
-    resultRowWithCheckTemplate,
-    resultRowWithControlsTemplate
-} from "./result-templates.js";
-import {
     appTemplate,
 } from "./templates.js";
 
@@ -65,19 +60,16 @@ export class Router {
         '#demonstration' : {
             mode : 'demonstration',
             info: 'Режим демонстрации',
-            // rowTemplate: resultRowWithControlsTemplate,
             initLevel(Router) { Router.initDemonstrationLevel(); }
         },
         '#training': {
             mode: 'training',
             info: 'Режим тренажера',
-            // rowTemplate: resultRowTemplate,
             initLevel(Router) { Router.initTrainingLevel(); }
         },
         '#check': {
             mode: 'check',
             info: 'Режим проверки',
-            // rowTemplate: resultRowWithCheckTemplate,
             initLevel(Router) { Router.initCheckLevel(); }
         }
     };
@@ -182,13 +174,9 @@ export class Router {
             clearTimeout(window.currentCheck);
         }
         const historyContainer = document.getElementById('history-container');
-        // const currentLevel = document.getElementById('current-level');
         if (historyContainer) {
             historyContainer.innerHTML = '';
         }
-        // if (currentLevel) {
-        //     currentLevel.innerHTML = '';
-        // }
         this.cleanElements(true);
     };
 
@@ -209,10 +197,9 @@ export class Router {
             this.outputStorage();
 
             if (this.isNext && !document.querySelector('.next-level-button')) {
-                const row =
-                    document.getElementById('level-row-' + this.currentLevel);
-                if (row) {
-                    this.createNextLevelButton(row);
+                const container = document.getElementById('global-value');
+                if (container) {
+                    this.createNextLevelButton(container);
                 }
             }
         }
@@ -229,6 +216,7 @@ export class Router {
     };
 
     createSpeedControl(container) {
+
         container.insertAdjacentHTML('beforeend', `
                         <div class="range-speed global-item-3">
                             <label class="range-label"><b>Скорость</b></label>
@@ -243,6 +231,10 @@ export class Router {
                     `);
     };
 
+    /**
+     * Создает новый начальный уровень
+     * @param {HTMLElement} container - текущий контейнер.
+     */
     createLevelRow(container) {
         this.createGlobalContent();
         createContentWrapper(container);
@@ -261,6 +253,9 @@ export class Router {
         }
     };
 
+    /**
+     * Создает генерируемые матрицу и граф.
+     */
     createGlobalContent() {
         const container = document.getElementById("global-value");
         container.innerHTML = '';
@@ -302,7 +297,7 @@ export class Router {
 
     /**
      * Проверяет выполнение задания и переходит к следующему уровню.
-     * @param {HTMLElement} row - Строка уровня в интерфейсе.
+     * @param {HTMLElement} container - текущий контейнер.
      */
     checkGood(container) {
         if (checkMatrixCompletion(this.newGraph.Matrix,
@@ -321,7 +316,7 @@ export class Router {
 
     /**
      * Выполняется по завершении уровня.
-     * @param {HTMLElement} row - Строка уровня в интерфейсе.
+     * @param {HTMLElement} container - текущий контейнер.
      */
     onComplete(container) {
         if (this.currentLevel < this.maxLevel) {
@@ -374,7 +369,7 @@ export class Router {
         checkButton.removeEventListener('click', this.handleCheckClick);
         if (this.isNext) {
             if (this.currentLevel < this.maxLevel) {
-                this.createNextLevelButton(currentWrapper);
+                this.createNextLevelButton(container);
             }
         } else {
             this.handleCheckClick = () => {
@@ -397,20 +392,20 @@ export class Router {
 
     /**
      * Создаёт кнопку "Следующая степень".
-     * @param {HTMLElement} row - Строка уровня.
+     * @param {HTMLElement} container - контейнер для вставки кнопки.
      */
     createNextLevelButton(container) {
         this.isNext = true;
         const nextLevelButton = document.createElement('button');
         nextLevelButton.textContent = 'Следующая степень';
-        nextLevelButton.className = 'button next-level-button global-item-4';
+        nextLevelButton.className = 'button next-level-button global-item-3';
         nextLevelButton.addEventListener('click', () => {
             this.currentLevel++;
             this.isNext = false;
             this.addToStorage();
             this.printNext(container);
         });
-        container.insertAdjacentElement('afterend', nextLevelButton);
+        container.appendChild(nextLevelButton);
     };
 
     /**
@@ -484,18 +479,10 @@ export class Router {
         container.innerHTML = '';
         for (const level of this.storedLevels) {
             const newLevel = document.createElement('div');
-            newLevel.className = 'history-item';
             createContentWrapper(newLevel);
-            // const row =
-            //     this.createLevelRow(levelsContainer, resultRowTemplate,
-            //                         level.currentLevel, level.multiplyType);
-            const textContainer =
-                newLevel.querySelector('.content-text-container');
-            textContainer.textContent =
-                this.createInfo(level.currentLevel, level.multiplyType);
+
             renderMatrix(level.storedGraph, newLevel, true, true);
             container.appendChild(newLevel);
-            // levelsContainer.prepend(row);
         }
     }
 

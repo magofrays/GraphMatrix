@@ -1,22 +1,19 @@
 .range-speed {
   display: grid;
-  /* gap: 20px; */
   width: 200px;
   justify-items: center;
 }
 
 .range-label {
-  grid-row: 1;              /* Вторая строка */
-  display: flex;
-  justify-self: center;
+  grid-row: 1;
   text-align: center;
+  margin-top: 10px;
 }
 
 .speed-control {
-  grid-row: 2;              /* Вторая строка */
-  display: flex;
-  justify-self: center;
-  text-align: center;
+  grid-row: 2;
+  width: 100%;
+  margin-top: 10px;
 
   accent-color: #3f8534;
   appearance: none;
