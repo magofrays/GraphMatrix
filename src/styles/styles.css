@@ -71,7 +71,13 @@ body {
   background-color: #cbfbb1;
   border: 2px solid #6a9f6a;
 }
-
+.vis-network-container {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
 .controls-container {
   display: flex;
   align-items: flex-start;
@@ -83,10 +89,13 @@ body {
   flex: 0 0 400px;
 }
 
-
+/* .graph-matrix{
+    width : 100px;
+    height : 100px;
+} */
 
 #matrix-container {
-  flex: 0 0 450px;
+  flex: 0 0 100%;
 }
 
 .controls select {
@@ -119,9 +128,12 @@ body {
   width: 70%; 
 }
 
-#graph-container {
+.graph-container {
   flex: 0 0 450px;
   width: 450px;
+  border :2px solid #3f8534;
+  border-radius: 4px;
+background: white;
 } 
 
 

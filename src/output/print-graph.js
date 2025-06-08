@@ -327,7 +327,6 @@ export function renderMatrixCheck(graph, container, answerGraph) {
 }
 
 function changeEdge(uiGraph, i, j, arrowColor, value) {
-    console.log("changed", i, j);
     removeEdge(uiGraph, i, j);
     if (value > 0) {
         uiGraph.edges.add({
@@ -443,74 +442,121 @@ export function displayGraph(graph, container, answerGraph = null) {
     }
     let graphContainer = container.querySelector(".graph-container");
     const graphData = createGraphFromMatrix(graph, answerGraph);
-    graphContainer.style.width = '70%';
-    graphContainer.style.height = '70%';
+    graphContainer.style.width = '400px';
+    graphContainer.style.height = '400px';
     const data = {nodes : graphData.nodes, edges : graphData.edges};
     const options = {
-        layout : {randomSeed : 42, improvedLayout : false},
+        layout : {
+            improvedLayout : false,
+            randomSeed : 42 // Для воспроизводимого расположения
+        },
         nodes : {
             size : 30,
             font : {
                 size : 30,
                 face : 'Arial',
                 align : 'center',
+                color : '#2c3e50',
+                strokeWidth : 3,
+                strokeColor : '#ffffff'
             },
-            fixed : {x : true, y : true},
-            physics : false,
             shape : 'circle',
             color : {
                 background : '#cbfbb1',
                 border : '#6a9f6a',
-                highlight : {background : '#cbfbb1', border : '#6a9f6a'}
+                highlight : {background : '#a8e6a8', border : '#4a7c4a'},
+                hover : {background : '#a8e6a8', border : '#4a7c4a'}
             },
             borderWidth : 2,
-            borderWidthSelected : 2,
-            scaling : {min : 30, max : 30, label : {enabled : false}}
+            borderWidthSelected : 4,
+            shadow : {
+                enabled : true,
+                color : 'rgba(0,0,0,0.2)',
+                size : 10,
+                x : 5,
+                y : 5
+            },
+            scaling : {
+                min : 30,
+                max : 30,
+                label : {
+                    enabled : true,
+                    min : 14,
+                    max : 30,
+                    maxVisible : 30,
+                    drawThreshold : 5
+                }
+            }
         },
         edges : {
             selfReference : {size : 20, angle : Math.PI / 4},
-            color : {color : '#6a9f6a', opacity : 1.0, highlight : '#6a9f6a'},
+            color : {
+                color : '#6a9f6a',
+                opacity : 1.0,
+                highlight : '#4a7c4a',
+                hover : '#4a7c4a'
+            },
             width : 2,
+            selectionWidth : 4,
             smooth : {type : 'continuous', roundness : 0.5},
             font : {
                 size : 17,
+                face : 'Arial',
                 strokeWidth : 5,
+                color : '#2c3e50',
+                align : 'middle'
             },
-            physics : false
-        },
-        physics : {
-            enabled : false,
-            stabilization : {enabled : true, iterations : 100}
+            arrows : {to : {enabled : true, scaleFactor : 0.8, type : 'arrow'}},
+            shadow : {
+                enabled : true,
+                color : 'rgba(0,0,0,0.1)',
+                size : 10,
+                x : 2,
+                y : 2
+            }
         },
         interaction : {
             zoomView : false,
             dragView : false,
             dragNodes : false,
-            selectable : false,
-            hover : true,
-            tooltipDelay : 0,
-            hideEdgesOnDrag : false,
-            hideNodesOnDrag : false
+            multiselect : false,
+            // hover : {zoom : false, drag : false}
         },
-        width : '70%',
-        height : '70%',
-        autoResize : false
+        physics : {
+            enabled : true,
+            stabilization : {
+                enabled : true,
+                iterations : 50, // Меньше итераций = быстрее
+                updateInterval : 10 // Чаще обновляем
+            },
+            solver : 'repulsion', // Быстрый алгоритм
+            repulsion : {
+                nodeDistance : 70,
+                damping : 0.5 // Меньше "пружинность"
+            }
+        },
+        configure : {enabled : false},
+        width : '100%',
+        height : '100%',
+        autoResize : true
     };
     const nodeCount = data.nodes.length;
     const radius = 170;
-    const center = {x : 200, y : 210};
+    const center = {x : 0, y : 0};
     data.nodes.forEach((node, i) => {
         const angle = (i * 2 * Math.PI) / nodeCount - 7;
         node.x = center.x + radius * Math.cos(angle);
         node.y = center.y + radius * Math.sin(angle);
     });
     const network = new vis.Network(graphContainer, data, options);
-    network.once('stabilizationIterationsDone', function() {
-        network.setOptions({
-            nodes :
-                {size : 30, scaling : {min : 25, max : 25}, font : {size : 30}}
+
+    network.on('stabilizationIterationsDone', () => {
+        network.fit({
+            animation : {
+                duration : 100, // Очень короткая анимация (100ms)
+                easingFunction : 'linear'
+            }
         });
-        network.redraw();
     });
     return data;
 }
