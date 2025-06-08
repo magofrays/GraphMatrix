@@ -5,7 +5,7 @@ const appColors =
         redArrow : "#FF4500",
         greenArrow : "#3f8534",
         greenCell : "#e3f8d8",
-        blueArrow : "#ff0000",
+        highlightArrow : "#848484",
         redCell : "#ffaaaa",
         defaultCell : "#f9f9f9"
     }
@@ -112,9 +112,9 @@ function signCellToEdge(uiGraph, cell, i, j) {
             uiGraph.edges.update({
                 id : edge.id,
                 color : {
-                    color : appColors.blueArrow,
-
-                }
+                    color : appColors.highlightArrow,
+                },
+                width : 4,
             });
         });
         cell.addEventListener('mouseleave', () => {
@@ -122,7 +122,8 @@ function signCellToEdge(uiGraph, cell, i, j) {
                 id : edge.id,
                 color : {
                     color : edgeColor,
-                }
+                },
+                width : 2
             });
         });
     }
@@ -205,7 +206,7 @@ export function renderMatrixTraining(graph, container, answerGraph,
         return;
     const uiGraph = displayGraph(graph, container, answerGraph);
     const matrixContainer = container.querySelector('.matrix-container');
-
+    const maxLength = String(answerGraph.findMaxWeight()).length;
     const matrix = graph.Matrix;
     const table = createEmptyMatrix(matrix.length);
 
@@ -215,7 +216,7 @@ export function renderMatrixTraining(graph, container, answerGraph,
             const cell = row.cells[j + 1];
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 8;
+            input.maxLength = maxLength;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
@@ -281,21 +282,21 @@ export function renderMatrixTraining(graph, container, answerGraph,
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
  * матрица.
  */
-export function renderMatrixCheck(graph, container) {
+export function renderMatrixCheck(graph, container, answerGraph) {
     if (!container)
         return;
     const uiGraph = displayGraph(graph, container);
     const matrixContainer = container.querySelector('.matrix-container');
     const matrix = graph.Matrix;
     const table = createEmptyMatrix(matrix.length);
-
+    const maxLength = String(answerGraph.findMaxWeight()).length;
     for (let i = 0; i < matrix.length; i++) {
         const row = table.rows[i + 1];
         for (let j = 0; j < matrix[i].length; j++) {
             const cell = row.cells[j + 1];
             const input = document.createElement("input");
             input.type = "text";
-            input.maxLength = 8;
+            input.maxLength = maxLength;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
@@ -442,8 +443,8 @@ export function displayGraph(graph, container, answerGraph = null) {
     }
     let graphContainer = container.querySelector(".graph-container");
     const graphData = createGraphFromMatrix(graph, answerGraph);
-    graphContainer.style.width = '450px';
-    graphContainer.style.height = '450px';
+    graphContainer.style.width = '70%';
+    graphContainer.style.height = '70%';
     const data = {nodes : graphData.nodes, edges : graphData.edges};
     const options = {
         layout : {randomSeed : 42, improvedLayout : false},
@@ -469,10 +470,10 @@ export function displayGraph(graph, container, answerGraph = null) {
         edges : {
             selfReference : {size : 20, angle : Math.PI / 4},
             color : {color : '#6a9f6a', opacity : 1.0, highlight : '#6a9f6a'},
-            width : 3,
+            width : 2,
             smooth : {type : 'continuous', roundness : 0.5},
             font : {
-                size : 20,
+                size : 17,
                 strokeWidth : 5,
             },
             physics : false
@@ -486,7 +487,7 @@ export function displayGraph(graph, container, answerGraph = null) {
             dragView : false,
             dragNodes : false,
             selectable : false,
-            hover : false,
+            hover : true,
             tooltipDelay : 0,
             hideEdgesOnDrag : false,
             hideNodesOnDrag : false
