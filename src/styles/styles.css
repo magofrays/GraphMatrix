@@ -19,6 +19,15 @@ h1 {
   margin-left: 20px;
 }
 
+.info-3 {
+  font-style: italic;
+}
+
+.info-4{
+  margin-left: 20px;
+  font-weight: normal;
+}
+
 body {
   font-family: Arial, sans-serif;
   max-width: 100%;
@@ -79,10 +88,14 @@ body {
   overflow: hidden !important;
 }
 .controls-container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* justify-content: space-between; */
   width: 100%;
+}
+
+.info {
+  justify-content: center;
 }
 
 .controls {
@@ -97,7 +110,7 @@ body {
 
 
 .controls select {
-  width: 70%; 
+  width: 300px; 
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -106,7 +119,7 @@ body {
 }
 
 .controls .ts-wrapper {
-  width: 70% !important;
+  width: 300px !important;
   margin-bottom: 10px;
 }
 
@@ -123,7 +136,7 @@ body {
 }
 
 #generate-graph {
-  width: 70%; 
+  width: 300px; 
 }
 
 
