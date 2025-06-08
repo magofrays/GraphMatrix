@@ -206,6 +206,15 @@ export class Router {
                     this.createNextLevelButton(container);
                 }
             }
+        } else{
+            if (AppState.graph != null){
+                if (this.currentMode === '#check') {
+                    this.cleanupPreviousMode();
+                    generateNewGraph(this, AppState.graph.size, AppState.graph.EdgeNumber, AppState.graph.GenType, false);
+                } else {
+                    this.createGlobalContent();
+                }
+            }
         }
     };
 

@@ -38,8 +38,10 @@ function loadStyles() {
  * - добавляет обработчик кнопки "Сгенерировать граф".
  */
 
-export function generateNewGraph(router, countVertex, countEdges, graphType){
-    router.restart(countVertex);
+export function generateNewGraph(router, countVertex, countEdges, graphType, isRestart = true){
+    if (isRestart){
+        router.restart(countVertex);
+    }
     if (countEdges == -1) {
         showErrorSelectEdgesMessage();
         return;
