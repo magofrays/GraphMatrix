@@ -69,13 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const graphType = selectManager.getGraphType();
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             router.createGlobalContent();
-
-
-            //рисование перенести
-            // const container = document.getElementById("controls-container");
-            // createContentWrapper(container);
-            // renderMatrix(AppState.graph, container);
-            // displayGraph(AppState.graph, container);
         }
     });
 });
