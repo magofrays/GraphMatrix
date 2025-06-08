@@ -9,14 +9,15 @@ import {showCompletionMessage} from "./messages.js";
 export function createContentWrapper(container) {
     if (!container)
         return;
-    let contentWrapper = container.querySelector(".content-wrapper");
-    if (contentWrapper) {
-        contentWrapper.remove()
-    }
+    // let contentWrapper = container.querySelector(".content-wrapper");
+    // if (contentWrapper) {
+    //     contentWrapper.remove()
+    // }
     container.insertAdjacentHTML('beforeend', `
                         <div class="content-wrapper" id="content-wrapper">
-                            <div class="matrix-container"></div>
-                            <div class="graph-container"></div>
+                            <div class="content-text-container wrapper-item-1"></div>
+                            <div class="matrix-container wrapper-item-2"></div>
+                            <div class="graph-container wrapper-item-3"></div>
                         </div>
                     `);
 }
@@ -343,7 +344,7 @@ export function renderMatrixDemonstration(graph, container,
         table.appendChild(row);
     }
     matrixContainer.appendChild(table);
-    const speedControl = container.querySelector('.speed-control');
+    const speedControl = document.querySelector('.speed-control');
     let speed = 3500 - parseInt(speedControl.value);
     speedControl.addEventListener(
         'input', () => { speed = 3500 - parseInt(speedControl.value); });
@@ -446,8 +447,8 @@ export function displayGraph(graph, container, answerGraph = null) {
             hideEdgesOnDrag : false,
             hideNodesOnDrag : false
         },
-        width : '100%',
-        height : '100%',
+        width : '70%',
+        height : '70%',
         autoResize : false
     };
     const nodeCount = data.nodes.length;

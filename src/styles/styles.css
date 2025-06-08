@@ -163,10 +163,14 @@ body {
 }
 
 .content-wrapper {
-  flex: 0.8;
+  /* flex: 0.8;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-evenly; */
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 колонки */
+  grid-template-rows: auto auto;
+
   border: 3px solid #cbfbb1; 
   border-radius: 5px; 
   padding: 5px;
@@ -174,4 +178,22 @@ body {
   gap: 0px;
   background-color: #effde7;
   box-sizing: border-box;
+  width: 700px;
+  height: 350px;
+}
+
+.wrapper-item-1 {
+  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
+  grid-row: 1;              /* Вторая строка */
+  text-align: center;       /* Выравниваем текст по центру */
+}
+
+.wrapper-item-2 {
+  grid-column: 1;  /* Первая колонка */
+  grid-row: 2;     /* Первая строка */
+}
+
+.wrapper-item-3 {
+  grid-column: 2;  /* Вторая колонка */
+  grid-row: 2;     /* Первая строка */
 }

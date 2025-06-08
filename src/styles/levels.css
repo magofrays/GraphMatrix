@@ -7,14 +7,31 @@
     border-bottom: none;
 }
 
-#levels-container {
+/* #levels-container {
     margin-top: 20px;
     height: 100%;
+} */
+
+#history-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 колонки */
+  gap: 10px;  /* Отступ между элементами */
+  margin-bottom: 20px;
+  justify-items: center;
+}
+
+.hisory-item {
+  background: #f0f0f0;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #ddd;
 }
 
 .check-answer {
-    margin-top: 50px;
+    margin-top: 20px;
     width: 200px;
+    text-align: center;      /* Горизонтальное центрирование текста */
+    /* margin-left: 20px; */
 }
 
 .result-row {
@@ -28,15 +45,50 @@
   border: 2px solid #ddd;
 }
 
-.result-info {
+
+
+
+.global-value {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 колонки */
+  grid-template-rows: auto auto auto;
+  justify-items: center;
+  gap: 10px;
+}
+
+.global-item-1 {
+  grid-column: 1;  /* Первая колонка */
+  grid-row: 1;     /* Первая строка */
+}
+
+.global-item-2 {
+  grid-column: 2;  /* Вторая колонка */
+  grid-row: 1;     /* Первая строка */
+}
+
+.global-item-3 {
+  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
+  grid-row: 2;              /* Вторая строка */
+  display: flex;
+  justify-self: center;
+}
+
+.global-item-4 {
+  grid-column: 1 / span 2;  /* Растягиваем на 2 колонки */
+  grid-row: 3;              /* Вторая строка */
+  display: flex;
+  justify-self: center;
+}
+
+/* .result-info {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   flex: 0 0 400px; 
   min-width: 200px;
-}
+} */
 
-.result-text-container {
+.content-text-container {
   text-decoration: none;
   color: #333;
   font-weight: bold;

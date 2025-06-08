@@ -66,19 +66,19 @@ export class Router {
         '#demonstration' : {
             mode : 'demonstration',
             info: 'Режим демонстрации',
-            rowTemplate: resultRowWithControlsTemplate,
+            // rowTemplate: resultRowWithControlsTemplate,
             initLevel(Router) { Router.initDemonstrationLevel(); }
         },
         '#training': {
             mode: 'training',
             info: 'Режим тренажера',
-            rowTemplate: resultRowTemplate,
+            // rowTemplate: resultRowTemplate,
             initLevel(Router) { Router.initTrainingLevel(); }
         },
         '#check': {
             mode: 'check',
             info: 'Режим проверки',
-            rowTemplate: resultRowWithCheckTemplate,
+            // rowTemplate: resultRowWithCheckTemplate,
             initLevel(Router) { Router.initCheckLevel(); }
         }
     };
@@ -182,14 +182,14 @@ export class Router {
         if (window.currentCheck) {
             clearTimeout(window.currentCheck);
         }
-        const levelsContainer = document.getElementById('levels-container');
-        const currentLevel = document.getElementById('current-level');
-        if (levelsContainer) {
-            levelsContainer.innerHTML = '';
+        const historyContainer = document.getElementById('history-container');
+        // const currentLevel = document.getElementById('current-level');
+        if (historyContainer) {
+            historyContainer.innerHTML = '';
         }
-        if (currentLevel) {
-            currentLevel.innerHTML = '';
-        }
+        // if (currentLevel) {
+        //     currentLevel.innerHTML = '';
+        // }
         this.cleanElements(true);
     };
 
@@ -223,31 +223,70 @@ export class Router {
      * Отображает текущий уровень в интерфейсе.
      */
     showCurrentMode() {
-        let container = document.getElementById('current-level');
-        this.createLevelRow(container, this.currentRoute.rowTemplate,
-                            this.currentLevel, this.multiplyType);
+        let container = document.getElementById('global-value');
+        this.createGlobalContent();
+        this.createLevelRow(container);
         this.currentRoute.initLevel(this);
     };
 
-    /**
-     * Создаёт строку уровня.
-     * @param {HTMLElement} container - Контейнер для строки уровня.
-     * @param {string} template - Шаблон строки.
-     * @param {number} level - Номер уровня.
-     * @param {string} multiplyType - Тип умножения матриц.
-     * @returns {HTMLElement} - Созданная строка уровня.
-     */
-    createLevelRow(container, template, level, multiplyType) {
-        const row = document.createElement('div');
-        row.id = 'level-row-' + level;
-        row.className = 'level-row';
-        row.innerHTML = template;
-        const textContainer = row.querySelector('.result-text-container');
-        textContainer.textContent = this.createInfo(level, multiplyType);
-        container.appendChild(row);
-        let resultRow = row.querySelector('.result-row');
-        createContentWrapper(resultRow);
-        return row;
+
+    createSpeedControl(container){
+        container.insertAdjacentHTML('beforeend', `
+                        <div class="range-speed global-item-3">
+                            <label class="range-label"><b>Скорость</b></label>
+                            <input type="range" class="speed-control" min="200" max="3400" value="1000" class="range-input">
+                        </div>
+                    `);
+    };
+
+    createCheckButton(container){
+        container.insertAdjacentHTML('beforeend', `
+                        <button class="check-answer button global-item-3">Проверить</button>
+                    `);
+    };
+
+    createLevelRow(container) {
+        this.createGlobalContent();
+        createContentWrapper(container);
+        const wrappers = container.querySelectorAll('.content-wrapper');
+        const currentWrapper = wrappers[wrappers.length - 1];
+        currentWrapper.classList.add('global-item-2');
+        const textContainer = currentWrapper.querySelector('.content-text-container');
+        textContainer.textContent = this.createInfo(this.currentLevel, this.multiplyType);
+        if (this.routes[this.currentMode].mode == 'demonstration'){
+            this.createSpeedControl(container);
+        }
+        if (this.routes[this.currentMode].mode == 'check'){
+            this.createCheckButton(container);
+        }
+    };
+
+    // createLevelRow(container, template, multiplyType) {
+    //     const row = document.createElement('div');
+    //     row.id = 'level-row-' + this.currentLevel;
+    //     row.className = 'level-row';
+    //     row.innerHTML = template;
+    //     // const textContainer = row.querySelector('.result-text-container');
+    //     // textContainer.textContent = this.createInfo(level, multiplyType);
+    //     this.createGlobalContent();
+    //     container.appendChild(row);
+    //     let resultRow = row.querySelector('.result-row');
+    //     createContentWrapper(resultRow);
+    //     const textContainer = resultRow.querySelector('.content-text-container');
+    //     textContainer.textContent = this.createInfo(this.currentLevel, multiplyType);
+    //     return row;
+    // };
+
+    createGlobalContent(){
+        const container = document.getElementById("global-value");
+        container.innerHTML = '';
+        createContentWrapper(container);
+        const currentWrapper = container.querySelector('.content-wrapper');
+        currentWrapper.classList.add('global-item-1')
+        const textContainer = container.querySelector('.content-text-container');
+        textContainer.textContent = "Начальный граф";
+        renderMatrix(AppState.graph, container);
+        displayGraph(AppState.graph, container);
     };
 
     /**
@@ -281,28 +320,28 @@ export class Router {
      * Проверяет выполнение задания и переходит к следующему уровню.
      * @param {HTMLElement} row - Строка уровня в интерфейсе.
      */
-    checkGood(row) {
+    checkGood(container) {
         if (checkMatrixCompletion(this.newGraph.Matrix,
                                   this.answerGraph.Matrix)) {
             this.cleanElements();
-            if (this.currentLevel /*- 1*/ < this.maxLevel) {
-                this.createNextLevelButton(row);
+            if (this.currentLevel < this.maxLevel) {
+                this.createNextLevelButton(container);
             } else {
-                renderMatrix(this.answerGraph, row, true);
+                renderMatrix(this.answerGraph, container, true);
             }
             return;
         }
         window.currentCheck = setTimeout(
-            () => { this.checkGood(row); }, 1000);
+            () => { this.checkGood(container); }, 1000);
     }
 
     /**
      * Выполняется по завершении уровня.
      * @param {HTMLElement} row - Строка уровня в интерфейсе.
      */
-    onComplete(row) {
+    onComplete(container) {
         if (this.currentLevel < this.maxLevel) {
-            this.createNextLevelButton(row);
+            this.createNextLevelButton(container);
         } 
     };
 
@@ -310,14 +349,16 @@ export class Router {
      * Инициализирует уровень демонстрации.
      */
     initDemonstrationLevel() {
-        const row = document.getElementById('level-row-' + this.currentLevel);
-        renderMatrixDemonstration(this.newGraph, row, this.answerGraph);
+        const container = document.getElementById('global-value');
+        const wrappers = container.querySelectorAll('.content-wrapper');
+        const currentWrapper = wrappers[wrappers.length - 1];
+        renderMatrixDemonstration(this.newGraph, currentWrapper, this.answerGraph);
         if (this.isNext) {
             if (this.currentLevel < this.maxLevel) {
-                this.createNextLevelButton(row);
+                this.createNextLevelButton(container);
             }
         } else {
-            this.checkGood(row);
+            this.checkGood(container);
         }
     };
 
@@ -325,10 +366,12 @@ export class Router {
      * Инициализирует уровень тренировки.
      */
     initTrainingLevel() {
-        const row = document.getElementById('level-row-' + this.currentLevel);
-        renderMatrixTraining(this.newGraph, row, this.answerGraph, () => {
+        const container = document.getElementById('global-value');
+        const wrappers = container.querySelectorAll('.content-wrapper');
+        const currentWrapper = wrappers[wrappers.length - 1];
+        renderMatrixTraining(this.newGraph, currentWrapper, this.answerGraph, () => {
             if (this.currentLevel < this.maxLevel) {
-                this.createNextLevelButton(row);
+                this.createNextLevelButton(container);
             }
         });
     };
@@ -337,13 +380,15 @@ export class Router {
      * Инициализирует уровень проверки.
      */
     initCheckLevel() {
-        const row = document.getElementById('level-row-' + this.currentLevel);
-        const checkButton = row.querySelector('.check-answer');
-        renderMatrixCheck(this.newGraph, row, this.answerGraph);
+        const container = document.getElementById('global-value');
+        const wrappers = container.querySelectorAll('.content-wrapper');
+        const currentWrapper = wrappers[wrappers.length - 1];
+        const checkButton = document.querySelector('.check-answer');
+        renderMatrixCheck(this.newGraph, currentWrapper, this.answerGraph);
         checkButton.removeEventListener('click', this.handleCheckClick);
         if (this.isNext) {
             if (this.currentLevel < this.maxLevel) {
-                this.createNextLevelButton(row);
+                this.createNextLevelButton(currentWrapper);
             }
         } else {
             this.handleCheckClick = () => {
@@ -353,8 +398,8 @@ export class Router {
                                           this.answerGraph.Matrix)) {
                     showCompletionMessage();
                     this.cleanElements();
-                    lockMatrixInputs(row.querySelector('.matrix-container'));
-                    this.onComplete(row);
+                    lockMatrixInputs(currentWrapper.querySelector('.matrix-container'));
+                    this.onComplete(container);
                 } else {
                     showFailMessage();
                 }
@@ -367,30 +412,30 @@ export class Router {
      * Создаёт кнопку "Следующая степень".
      * @param {HTMLElement} row - Строка уровня.
      */
-    createNextLevelButton(row) {
+    createNextLevelButton(container) {
         this.isNext = true;
         const nextLevelButton = document.createElement('button');
         nextLevelButton.textContent = 'Следующая степень';
-        nextLevelButton.className = 'button next-level-button';
+        nextLevelButton.className = 'button next-level-button global-item-4';
         nextLevelButton.addEventListener('click', () => {
             this.currentLevel++;
             this.isNext = false;
             this.addToStorage();
-            this.printNext();
+            this.printNext(container);
         });
-        row.insertAdjacentElement('afterend', nextLevelButton);
+        container.insertAdjacentElement('afterend', nextLevelButton);
     };
 
     /**
      * Переход к следующему уровню.
      */
-    printNext() {
-        const levelsContainer = document.getElementById('levels-container');
-        const currentLevel = document.getElementById('current-level');
-        levelsContainer.innerHTML = '';
-        currentLevel.innerHTML = '';
+    printNext(container) {
+        const wrappers = container.querySelectorAll('.content-wrapper');
+        const currentWrapper = wrappers[wrappers.length - 1];
+        currentWrapper.innerHTML = '';
         this.updateInfo();
         this.createTestMatrices();
+        this.cleanElements(true);
         this.showCurrentMode();
         this.outputStorage();
     };
@@ -448,14 +493,21 @@ export class Router {
      * Выводит историю в интерфейс.
      */
     outputStorage() {
-        const levelsContainer = document.getElementById('levels-container');
+        const container = document.getElementById('history-container');
+        container.innerHTML = '';
         for (const level of this.storedLevels) {
-            const row =
-                this.createLevelRow(levelsContainer, resultRowTemplate,
-                                    level.currentLevel, level.multiplyType);
-            renderMatrix(level.storedGraph, row, true);
-            displayGraph(level.storedGraph, row);
-            levelsContainer.prepend(row);
+            const newLevel = document.createElement('div');
+            newLevel.className = 'history-item';
+            createContentWrapper(newLevel);
+            // const row =
+            //     this.createLevelRow(levelsContainer, resultRowTemplate,
+            //                         level.currentLevel, level.multiplyType);
+            const textContainer = newLevel.querySelector('.content-text-container');
+            textContainer.textContent = this.createInfo(level.currentLevel, level.multiplyType);
+            renderMatrix(level.storedGraph, newLevel, true);
+            displayGraph(level.storedGraph, newLevel);
+            container.appendChild(newLevel);
+            // levelsContainer.prepend(row);
         }
     }
 
