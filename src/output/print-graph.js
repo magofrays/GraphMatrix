@@ -1,5 +1,15 @@
 import {showCompletionMessage} from "./messages.js";
 
+const appColors =
+    {
+        redArrow : "#FF4500",
+        greenArrow : "#3f8534",
+        greenCell : "#e3f8d8",
+        blueArrow : "#ff0000",
+        redCell : "#ffaaaa",
+        defaultCell : "#f9f9f9"
+    }
+
 /**
  * Создаёт или обновляет контейнер с классом "content-wrapper" внутри указанного
  * элемента.
@@ -15,6 +25,7 @@ export function createContentWrapper(container) {
     }
     container.insertAdjacentHTML('beforeend', `
                         <div class="content-wrapper" id="content-wrapper">
+                            <div class="content-text-container"></div>
                             <div class="matrix-container"></div>
                             <div class="graph-container"></div>
                         </div>
@@ -43,23 +54,15 @@ function createGraphFromMatrix(graph, answerGraph = null) {
     }
     const graphType = graph.GenType;
     let border = matrix.length;
-    let addColor = "#effde7";
-    for (let i = 0; i < matrix.length; i++) {
-        edges.add({
-            from : i,
-            to : i,
-            color : {color : addColor},
-        });
-    }
     for (let i = 0; i < matrix.length; i++) {
         if (graphType === "SYMM") {
             border = i + 1;
         }
         for (let j = 0; j < border; j++) {
             if (matrix[i][j] > 0) {
-                let currentColor = "#3f8534";
+                let currentColor = appColors.greenArrow;
                 if (answerGraph && answerGraph.Matrix[i][j] != matrix[i][j]) {
-                    currentColor = "#FF4500";
+                    currentColor = appColors.redArrow;
                 }
                 if (graphType === "SYMM") {
                     if (matrix[i][j] > 1) {
@@ -99,6 +102,57 @@ function createGraphFromMatrix(graph, answerGraph = null) {
     return {nodes, edges};
 }
 
+function signCellToEdge(uiGraph, cell, i, j) {
+    const edge =
+        uiGraph.edges.get({filter : e => e.from === i && e.to === j})[0];
+
+    if (edge) {
+        const edgeColor = edge.color?.color;
+        cell.addEventListener('mouseover', () => {
+            uiGraph.edges.update({
+                id : edge.id,
+                color : {
+                    color : appColors.blueArrow,
+
+                }
+            });
+        });
+        cell.addEventListener('mouseleave', () => {
+            uiGraph.edges.update({
+                id : edge.id,
+                color : {
+                    color : edgeColor,
+                }
+            });
+        });
+    }
+}
+
+function createEmptyMatrix(size) {
+    const table = document.createElement("table");
+    table.className = "graph-matrix";
+    const headerRow = document.createElement("tr");
+    headerRow.appendChild(document.createElement("th"));
+    for (let j = 0; j < size; j++) {
+        const th = document.createElement("th");
+        th.textContent = j;
+        headerRow.appendChild(th);
+    }
+    table.appendChild(headerRow);
+    for (let i = 0; i < size; i++) {
+        const row = document.createElement("tr");
+        const th = document.createElement("th");
+        th.textContent = i;
+        row.appendChild(th);
+        for (let j = 0; j < size; j++) {
+            const td = document.createElement("td");
+            row.appendChild(td);
+        }
+        table.appendChild(row);
+    }
+    return table;
+}
+
 /**
  * Отрисовывает матрицу графа в указанном контейнере.
  *
@@ -108,35 +162,28 @@ function createGraphFromMatrix(graph, answerGraph = null) {
  * @param {boolean} [isTrue=false] - Если true, таблица будет окрашена как
  * завершённая.
  */
-export function renderMatrix(graph, container, isTrue = false) {
+export function renderMatrix(graph, container, isTrue = false,
+                             drawGraph = false) {
+    let uiGraph = null;
+    if (drawGraph) {
+        uiGraph = displayGraph(graph, container);
+    }
     if (!container)
         return;
     let matrixContainer = container.querySelector(".matrix-container");
-    const table = document.createElement("table");
-    table.className = "graph-matrix";
     const matrix = graph.Matrix;
-    const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th"));
-    for (let j = 0; j < matrix.length; j++) {
-        const th = document.createElement("th");
-        th.textContent = j;
-        headerRow.appendChild(th);
-    }
-    table.appendChild(headerRow);
+    const table = createEmptyMatrix(matrix.length);
     for (let i = 0; i < matrix.length; i++) {
-        const row = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = i;
-        row.appendChild(th);
+        const row = table.rows[i + 1];
         for (let j = 0; j < matrix[i].length; j++) {
-            const td = document.createElement("td");
-            td.textContent = matrix[i][j];
+            const cell = row.cells[j + 1];
+            if (uiGraph)
+                signCellToEdge(uiGraph, cell, i, j);
+            cell.textContent = matrix[i][j];
             if (isTrue) {
-                td.style.backgroundColor = "#e3f8d8";
+                cell.style.backgroundColor = appColors.greenCell;
             }
-            row.appendChild(td);
         }
-        table.appendChild(row);
     }
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
@@ -156,38 +203,29 @@ export function renderMatrixTraining(graph, container, answerGraph,
                                      onComplete) {
     if (!container)
         return;
+    const uiGraph = displayGraph(graph, container, answerGraph);
     const matrixContainer = container.querySelector('.matrix-container');
-    matrixContainer.innerHTML = '';
-    const table = document.createElement("table");
-    table.className = "graph-matrix";
+
     const matrix = graph.Matrix;
-    const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th"));
-    for (let j = 0; j < matrix.length; j++) {
-        const th = document.createElement("th");
-        th.textContent = j;
-        headerRow.appendChild(th);
-    }
-    table.appendChild(headerRow);
+    const table = createEmptyMatrix(matrix.length);
+
     for (let i = 0; i < matrix.length; i++) {
-        const row = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = i;
-        row.appendChild(th);
+        const row = table.rows[i + 1];
         for (let j = 0; j < matrix[i].length; j++) {
-            const td = document.createElement("td");
+            const cell = row.cells[j + 1];
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 8;
             input.dataset.row = i;
             input.dataset.col = j;
             if (matrix[i][j] != -1) {
+                signCellToEdge(uiGraph, cell, i, j);
                 input.value = matrix[i][j];
                 const correctValue = answerGraph.Matrix[i][j];
                 if (matrix[i][j] == correctValue) {
-                    input.style.backgroundColor = "#e3f8d8";
+                    input.style.backgroundColor = appColors.greenCell;
                 } else {
-                    input.style.backgroundColor = "#ffaaaa";
+                    input.style.backgroundColor = appColors.redCell;
                 }
             }
             input.addEventListener('input', (e) => {
@@ -204,27 +242,30 @@ export function renderMatrixTraining(graph, container, answerGraph,
                 if (isNaN(value))
                     value = -1;
                 graph.changeEdge(row, col, value);
+                let arrowColor = null;
                 const correctValue = answerGraph.Matrix[row][col];
                 if (value == -1) {
-                    e.target.style.backgroundColor = "#f9f9f9";
+                    e.target.style.backgroundColor = appColors.defaultCell;
+                    arrowColor = appColors.greenArrow;
                 } else if (value === correctValue) {
-                    e.target.style.backgroundColor = "#e3f8d8";
+                    e.target.style.backgroundColor = appColors.greenCell;
+                    arrowColor = appColors.greenArrow;
                 } else {
-                    e.target.style.backgroundColor = "#ffaaaa";
+                    e.target.style.backgroundColor = appColors.redCell;
+                    arrowColor = appColors.redArrow;
                 }
+                changeEdge(uiGraph, row, col, arrowColor, value);
+                signCellToEdge(uiGraph, cell, row, col);
+
                 if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
                     showCompletionMessage();
                     lockMatrixInputs(matrixContainer);
                     onComplete();
                 }
-                displayGraph(graph, container, answerGraph);
             });
-            td.appendChild(input);
-            row.appendChild(td);
+            cell.appendChild(input);
         }
-        table.appendChild(row);
     }
-    displayGraph(graph, container, answerGraph);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
     if (checkMatrixCompletion(graph.Matrix, answerGraph.Matrix)) {
@@ -243,25 +284,15 @@ export function renderMatrixTraining(graph, container, answerGraph,
 export function renderMatrixCheck(graph, container) {
     if (!container)
         return;
+    const uiGraph = displayGraph(graph, container);
     const matrixContainer = container.querySelector('.matrix-container');
-    const table = document.createElement("table");
-    table.className = "graph-matrix";
     const matrix = graph.Matrix;
-    const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th"));
-    for (let j = 0; j < matrix.length; j++) {
-        const th = document.createElement("th");
-        th.textContent = j;
-        headerRow.appendChild(th);
-    }
-    table.appendChild(headerRow);
+    const table = createEmptyMatrix(matrix.length);
+
     for (let i = 0; i < matrix.length; i++) {
-        const row = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = i;
-        row.appendChild(th);
+        const row = table.rows[i + 1];
         for (let j = 0; j < matrix[i].length; j++) {
-            const td = document.createElement("td");
+            const cell = row.cells[j + 1];
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 8;
@@ -284,63 +315,73 @@ export function renderMatrixCheck(graph, container) {
                 if (isNaN(value))
                     value = -1;
                 graph.changeEdge(row, col, value);
-                displayGraph(graph, container);
+                changeEdge(uiGraph, row, col, appColors.greenArrow, value);
+                signCellToEdge(uiGraph, cell, row, col)
             });
-            td.appendChild(input);
-            row.appendChild(td);
+            cell.appendChild(input);
         }
-        table.appendChild(row);
     }
-    displayGraph(graph, container);
     matrixContainer.innerHTML = "";
     matrixContainer.appendChild(table);
 }
 
+function changeEdge(uiGraph, i, j, arrowColor, value) {
+    console.log("changed", i, j);
+    removeEdge(uiGraph, i, j);
+    if (value > 0) {
+        uiGraph.edges.add({
+            from : i,
+            to : j,
+            color : {color : arrowColor},
+            arrows : 'to',
+            color : {color : arrowColor},
+            label : value > 1 ? String(value) : "",
+            font : {color : arrowColor}
+        });
+    }
+}
+
+function removeEdge(uiGraph, i, j) {
+    const edge =
+        uiGraph.edges.get({filter : e => e.from === i && e.to === j})[0];
+    if (edge)
+        uiGraph.edges.remove(edge.id);
+}
 /**
  * Анимированно демонстрирует изменение матрицы в реальном времени.
  * в режиме демонстрации
- * 
+ *
  * @param {Graph} graph - Граф, матрица которого будет анимирована.
  * @param {HTMLElement} container - Контейнер, в котором будет отрисована
  * матрица.
- * @param {Graph} [answerGraph=null] - Граф с правильным результатом.
+ * @param {Graph} [answerGraph] - Граф с правильным результатом.
  */
-export function renderMatrixDemonstration(graph, container,
-                                          answerGraph = null) {
+export function renderMatrixDemonstration(graph, container, answerGraph) {
     if (!container)
         return;
+
+    const uiGraph = displayGraph(graph, container, null);
+
     const matrixContainer = container.querySelector('.matrix-container');
     if (window.currentAnimation) {
         clearTimeout(window.currentAnimation);
     }
-    matrixContainer.innerHTML = '';
-    const table = document.createElement("table");
-    table.className = "graph-matrix";
+
     const matrix = graph.Matrix;
+    const table = createEmptyMatrix(matrix.length);
     const answerMatrix = answerGraph.Matrix;
-    const headerRow = document.createElement("tr");
-    headerRow.appendChild(document.createElement("th"));
-    for (let j = 0; j < matrix.length; j++) {
-        const th = document.createElement("th");
-        th.textContent = j;
-        headerRow.appendChild(th);
-    }
-    table.appendChild(headerRow);
+
     for (let i = 0; i < matrix.length; i++) {
-        const row = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = i;
-        row.appendChild(th);
+        const row = table.rows[i + 1];
         for (let j = 0; j < matrix[i].length; j++) {
-            const td = document.createElement("td");
+            const cell = row.cells[j + 1];
             if (matrix[i][j] != -1) {
-                td.textContent = matrix[i][j];
+                cell.textContent = matrix[i][j];
+                signCellToEdge(uiGraph, cell, i, j);
             } else {
-                td.textContent = "";
+                cell.textContent = "";
             }
-            row.appendChild(td);
         }
-        table.appendChild(row);
     }
     matrixContainer.appendChild(table);
     const speedControl = container.querySelector('.speed-control');
@@ -356,8 +397,12 @@ export function renderMatrixDemonstration(graph, container,
         const j = currentStep % matrix.length;
         const newValue = answerMatrix[i][j];
         graph.changeEdge(i, j, newValue);
-        table.rows[i + 1].cells[j + 1].textContent = newValue;
-        displayGraph(graph, container, answerGraph);
+        const cell = table.rows[i + 1].cells[j + 1];
+        cell.textContent = newValue;
+
+        changeEdge(uiGraph, i, j, appColors.greenArrow, graph.Matrix[i][j]);
+        signCellToEdge(uiGraph, cell, i, j);
+
         currentStep++;
         window.currentAnimation = setTimeout(animateStep, speed);
     };
@@ -393,7 +438,7 @@ export function checkMatrixCompletion(userMatrix, correctMatrix) {
  */
 export function displayGraph(graph, container, answerGraph = null) {
     if (!container) {
-        return;
+        return null;
     }
     let graphContainer = container.querySelector(".graph-container");
     const graphData = createGraphFromMatrix(graph, answerGraph);
@@ -466,6 +511,7 @@ export function displayGraph(graph, container, answerGraph = null) {
         });
         network.redraw();
     });
+    return data;
 }
 
 /**
@@ -477,7 +523,7 @@ export function lockMatrixInputs(matrixContainer) {
     const inputs = matrixContainer.querySelectorAll('input[type="text"]');
     inputs.forEach(input => {
         input.readOnly = true;
-        input.style.backgroundColor = '#e3f8d8';
+        input.style.backgroundColor = appColors.greenCell;
         input.style.cursor = 'not-allowed';
     });
 }

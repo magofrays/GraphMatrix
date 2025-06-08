@@ -67,7 +67,7 @@ body {
   background-color: #f9f9f9;
 }
 
-.graph-matrix tr:hover {
+.graph-matrix td:hover {
   background-color: #cbfbb1;
   border: 2px solid #6a9f6a;
 }

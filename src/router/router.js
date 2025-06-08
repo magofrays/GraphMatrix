@@ -105,13 +105,13 @@ export class Router {
     /**
      * Меняет значение возможных степеней.
      */
-    changePowerOption(){
+    changePowerOption() {
         const powerSelect = document.getElementById('power');
         powerSelect.innerHTML = '';
         for (let i = 2; i <= this.maxLevel; i++) {
             const optionElement = document.createElement('option');
             optionElement.value = i.toString();
-            optionElement.textContent = i.toString(); 
+            optionElement.textContent = i.toString();
             powerSelect.appendChild(optionElement);
         }
     };
@@ -288,12 +288,12 @@ export class Router {
             if (this.currentLevel /*- 1*/ < this.maxLevel) {
                 this.createNextLevelButton(row);
             } else {
+                console.log("рисуем матрицу зачем же");
                 renderMatrix(this.answerGraph, row, true);
             }
             return;
         }
-        window.currentCheck = setTimeout(
-            () => { this.checkGood(row); }, 1000);
+        window.currentCheck = setTimeout(() => { this.checkGood(row); }, 1000);
     }
 
     /**
@@ -303,7 +303,7 @@ export class Router {
     onComplete(row) {
         if (this.currentLevel < this.maxLevel) {
             this.createNextLevelButton(row);
-        } 
+        }
     };
 
     /**
@@ -453,8 +453,8 @@ export class Router {
             const row =
                 this.createLevelRow(levelsContainer, resultRowTemplate,
                                     level.currentLevel, level.multiplyType);
-            renderMatrix(level.storedGraph, row, true);
-            displayGraph(level.storedGraph, row);
+            renderMatrix(level.storedGraph, row, true, true);
+            // displayGraph(level.storedGraph, row);
             levelsContainer.prepend(row);
         }
     }

@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             AppState.graph = new Graph(countVertex, countEdges, graphType);
             const container = document.getElementById("controls-container");
             createContentWrapper(container);
-            renderMatrix(AppState.graph, container);
-            displayGraph(AppState.graph, container);
+            renderMatrix(AppState.graph, container, false, true);
+            // displayGraph(AppState.graph, container);
         }
     });
 });
