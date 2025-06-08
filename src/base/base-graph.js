@@ -383,7 +383,8 @@ class Graph {
      *
      * Проверяет, является ли граф:
      * - симметричным (если matrix[i][j] === matrix[j][i]),
-     * - антисимметричным (если matrix[i][j] === 1 && matrix[j][i] === 0 для i !== j),
+     * - антисимметричным (если matrix[i][j] === 1 && matrix[j][i] === 0 для i
+     * !== j),
      * - асимметричным (отсутствие петель и только односторонние рёбра).
      *
      * @returns {GraphGenerationType} Тип графа: 'SYMM', 'ANTISYMM', 'ASYMM' или
@@ -460,6 +461,18 @@ class Graph {
      * Выводит матрицу графа в консоль.
      */
     printGraph() { console.log(this.matrix); }
+
+    findMaxWeight() {
+        let maxWeight = this.matrix[0][0];
+        for (let i = 0; i != this.size; i++) {
+            for (let j = 0; j != this.size; j++) {
+                if (this.matrix[i][j] > maxWeight) {
+                    maxWeight = this.matrix[i][j];
+                }
+            }
+        }
+        return maxWeight;
+    }
 }
 
 function classicMatrixMultiply(first, second) {

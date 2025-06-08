@@ -105,13 +105,13 @@ export class Router {
     /**
      * Меняет значение возможных степеней.
      */
-    changePowerOption(){
+    changePowerOption() {
         const powerSelect = document.getElementById('power');
         powerSelect.innerHTML = '';
         for (let i = 2; i <= this.maxLevel; i++) {
             const optionElement = document.createElement('option');
             optionElement.value = i.toString();
-            optionElement.textContent = i.toString(); 
+            optionElement.textContent = i.toString();
             powerSelect.appendChild(optionElement);
         }
     };
