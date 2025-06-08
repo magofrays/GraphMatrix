@@ -285,8 +285,7 @@ export class Router {
         currentWrapper.classList.add('global-item-1')
         const textContainer = container.querySelector('.content-text-container');
         textContainer.textContent = "Начальный граф";
-        renderMatrix(AppState.graph, container);
-        displayGraph(AppState.graph, container);
+        renderMatrix(AppState.graph, container, false, true);
     };
 
     /**
@@ -504,8 +503,7 @@ export class Router {
             //                         level.currentLevel, level.multiplyType);
             const textContainer = newLevel.querySelector('.content-text-container');
             textContainer.textContent = this.createInfo(level.currentLevel, level.multiplyType);
-            renderMatrix(level.storedGraph, newLevel, true);
-            displayGraph(level.storedGraph, newLevel);
+            renderMatrix(level.storedGraph, newLevel, true, true);
             container.appendChild(newLevel);
             // levelsContainer.prepend(row);
         }
