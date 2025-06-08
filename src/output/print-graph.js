@@ -448,10 +448,7 @@ export function displayGraph(graph, container, answerGraph = null) {
     graphContainer.style.height = '370px';
     const data = {nodes : graphData.nodes, edges : graphData.edges};
     const options = {
-        layout : {
-            improvedLayout : false,
-            randomSeed : 42 // Для воспроизводимого расположения
-        },
+        layout : {improvedLayout : false, randomSeed : 42},
         nodes : {
             size : 30,
             font : {
@@ -515,11 +512,8 @@ export function displayGraph(graph, container, answerGraph = null) {
         },
         physics : {
             enabled : true,
-            stabilization : {
-                enabled : true,
-                iterations : 50, // Меньше итераций = быстрее
-                updateInterval : 10 // Чаще обновляем
-            },
+            stabilization :
+                {enabled : true, iterations : 50, updateInterval : 10},
             solver : 'repulsion',
             repulsion : {
                 nodeDistance : 1,
