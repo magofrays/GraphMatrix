@@ -1,4 +1,7 @@
-import {AppState} from '../base/app.js';
+import {
+    AppState, 
+    generateNewGraph
+} from '../base/app.js';
 import {Graph} from "../base/base-graph.js";
 import {
     showCompletionMessage,
@@ -15,9 +18,7 @@ import {
     renderMatrixTraining
 } from "../output/print-graph.js";
 
-import {
-    appTemplate,
-} from "./templates.js";
+import {appTemplate} from "./templates.js";
 
 /**
  * Класс, управляющий маршрутизацией и режимами приложения.
@@ -136,6 +137,7 @@ export class Router {
             }
             this.cleanupPreviousMode(true);
             this.updateInfo();
+            AppState.power = this.power;
             this.currentLevel = parseInt(this.power);
             this.createTestMatrices();
             this.showCurrentMode();
@@ -190,6 +192,8 @@ export class Router {
                     if (this.isNext) {
                         this.isNext = false;
                     }
+                    generateNewGraph(this, AppState.graph.size, AppState.graph.EdgeNumber, AppState.graph.GenType);
+                    this.currentLevel = AppState.power;
                     this.createTestMatrices();
                 }
                 this.showCurrentMode();
@@ -479,7 +483,8 @@ export class Router {
     outputStorage() {
         const container = document.getElementById('history-container');
         container.innerHTML = '';
-        for (const level of this.storedLevels) {
+        for (let i = this.storedLevels.length - 1; i >= 0; i--) {
+            const level = this.storedLevels[i];
             const newLevel = document.createElement('div');
             createContentWrapper(newLevel);
             const textContainer = newLevel.querySelector('.content-text-container');
