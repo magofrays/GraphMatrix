@@ -495,6 +495,10 @@ export class Router {
             const newLevel = document.createElement('div');
             createContentWrapper(newLevel);
 
+            const textContainer =
+                newLevel.querySelector('.content-text-container');
+            textContainer.textContent =
+                this.createInfo(level.currentLevel, level.multiplyType);
             renderMatrix(level.storedGraph, newLevel, true, true);
             container.appendChild(newLevel);
         }
