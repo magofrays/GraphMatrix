@@ -90,7 +90,6 @@ body {
 .controls-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  /* justify-content: space-between; */
   width: 100%;
 }
 
@@ -101,12 +100,6 @@ body {
 .controls {
   flex: 0 0 400px;
 }
-
-/* .graph-matrix{
-    width : 100px;
-    height : 100px;
-} */
-
 
 
 .controls select {
